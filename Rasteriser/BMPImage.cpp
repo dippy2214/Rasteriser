@@ -175,7 +175,25 @@ void BMPImage::set_pixel(float x, float y, Color color)
         data[channels * (y * info_header.width + x) + 2] = color.r;
         if (channels == 4)
         {
-            data[channels * (y * info_header.width + x) + 3] = 255.0f;
+            data[channels * (y * info_header.width + x) + 3] = color.a;
+        }
+    }
+}
+
+void BMPImage::clear_image()
+{
+    for (int y = 0; y < info_header.height; y++)
+    {
+        for (int x = 0; x < info_header.width; x++)
+        {
+            int channels = info_header.bit_count / 8;
+            data[channels * (y * info_header.width + x) + 0] = 0.0f;
+            data[channels * (y * info_header.width + x) + 1] = 0.0f;
+            data[channels * (y * info_header.width + x) + 2] = 0.0f;
+            if (channels == 4)
+            {
+                data[channels * (y * info_header.width + x) + 3] = 255.0f;
+            }
         }
     }
 }
