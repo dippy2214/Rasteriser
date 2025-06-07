@@ -44,6 +44,41 @@ BMPImage::BMPImage(int32_t width, int32_t height, bool alpha)
     }
 }
 
+BMPImage::BMPImage(float2 size, bool alpha)
+{
+    if (size.x <= 0 || size.y <= 0)
+    {
+        throw std::runtime_error("The image width and height must be positive numbers");
+    }
+
+    info_header.width = size.x;
+    info_header.height = size.y;
+    if (alpha)
+    {
+        info_header.size = sizeof(BMPInfoHeader) + sizeof(BMPColorHeader);
+        file_header.offset_data = sizeof(BMPFileHeader) + sizeof(BMPInfoHeader) + sizeof(BMPColorHeader);
+
+        info_header.bit_count = 32;
+        info_header.compression = 3;
+        row_stride = size.x * 4;
+        data.resize(row_stride * size.y);
+        file_header.file_size = file_header.offset_data + data.size();
+    }
+    else
+    {
+        info_header.size = sizeof(BMPInfoHeader);
+        file_header.offset_data = sizeof(BMPFileHeader) + sizeof(BMPInfoHeader);
+
+        info_header.bit_count = 24;
+        info_header.compression = 0;
+        row_stride = size.x * 3;
+        data.resize(row_stride * size.y);
+
+        uint32_t new_stride = make_stride_aligned(4);
+        file_header.file_size = file_header.offset_data + data.size() + info_header.height * (new_stride - row_stride);
+    }
+}
+
 void BMPImage::read(const char* fname)
 {
     std::ifstream inp{ fname, std::ios_base::binary };

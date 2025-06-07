@@ -128,12 +128,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BMPImage.cpp" />
-    <ClCompile Include="float2.cpp" />
+    <ClCompile Include="FloatTypes.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="RenderTarget.cpp" />
+    <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BMPImage.h" />
-    <ClInclude Include="float2.h" />
+    <ClInclude Include="FloatTypes.h" />
+    <ClInclude Include="Model.h" />
+    <ClInclude Include="RenderTarget.h" />
+    <ClInclude Include="Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

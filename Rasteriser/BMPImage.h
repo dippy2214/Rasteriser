@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include "FloatTypes.h"
 
 #pragma pack(push, 1)
 struct BMPFileHeader
@@ -41,16 +42,6 @@ struct BMPColorHeader
 };
 #pragma pack(pop)
 
-struct Color
-{
-public:
-    Color(float r1, float g1, float b1, float a1) { r = r1; g = g1; b = b1; a = a1; }
-    float r = 0;
-    float g = 0;
-    float b = 0;
-    float a = 255;
-};
-
 class BMPImage
 {
 public:
@@ -61,6 +52,7 @@ public:
 
     BMPImage(const char* fname);
     BMPImage(int32_t width, int32_t height, bool has_alpha = true);
+    BMPImage(float2 size, bool has_alpha = true);
 
     void read(const char* fname);
     void write(const char* fname);
