@@ -1,175 +1,138 @@
-#include <string>
+#include <Windows.h>
+#include <stdint.h>
 #include <iostream>
-#include <chrono>
-#include <cstdlib>
-#include <algorithm>
+#include <fstream>
 
-#include "BMPImage.h"
-#include "FloatTypes.h"
-#include "Model.h"
-#include "RenderTarget.h"
+const int WIDTH = 800;
+const int HEIGHT = 400;
 
-bool IsOnRightSideOfLine(float2 a, float2 b, float2 p)
-{
-	float2 ap = p - a;
-	float2 abPerp = (b - a).Perpendicular();
-	return ap.Dot(abPerp) >= 0;
-}
-bool IsInsideTriangle(float2 a, float2 b, float2 c, float2 p)
-{
-	bool sideAB = IsOnRightSideOfLine(a, b, p);
-	bool sideBC = IsOnRightSideOfLine(b, c, p);
-	bool sideCA = IsOnRightSideOfLine(c, a, p);
+BITMAPINFO bitmap;
+void* pixels = nullptr;
 
-	return sideAB && sideBC && sideCA;
-}
+void OpenConsole() {
+	if (AllocConsole()) {
+		// Redirect std::cout to the console
+		FILE* consoleOut;
+		freopen_s(&consoleOut, "CONOUT$", "w", stdout);  // Use freopen_s for safer I/O
 
-float LargestOfThree(float a, float b, float c)
-{
-	if (a >= b)
-	{
-		if (a >= c)
-		{
-			return a;
-		}
-		else
-		{
-			return c;
-		}
+		// Optionally, redirect std::cin or std::cerr as needed
+		FILE* consoleIn;
+		freopen_s(&consoleIn, "CONIN$", "r", stdin);
+		FILE* consoleErr;
+		freopen_s(&consoleErr, "CONOUT$", "w", stderr);
+
+		// You can use std::cout, std::cin, and std::cerr directly now
+		std::cout << "Console initialized successfully!" << std::endl;
 	}
-	else
-	{
-		if (b >= c)
-		{
-			return b;
-		}
-		else
-		{
-			return c;
-		}
+	else {
+		std::cerr << "Failed to allocate console." << std::endl;
 	}
 }
-float SmallestOfThree(float a, float b, float c)
+
+void DrawTestPattern()
 {
-	if (a <= b)
+	uint32_t* pixelData = (uint32_t*)pixels;
+	for (int y = 0; y < HEIGHT; ++y)
 	{
-		if (a <= c)
+		for (int x = 0; x < WIDTH; x++)
 		{
-			return a;
-		}
-		else
-		{
-			return c;
-		}
-	}
-	else
-	{
-		if (b <= c)
-		{
-			return b;
-		}
-		else
-		{
-			return c;
+			pixelData[(y * WIDTH) + x] = 0xFF0000;
 		}
 	}
 }
 
-int Clamp(int x, int min, int max)
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (x < min)
-	{
-		return min;
+	switch (msg) {
+	case WM_PAINT: {
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hwnd, &ps);
+		StretchDIBits(
+			hdc,
+			0, 0, WIDTH, HEIGHT,
+			0, 0, WIDTH, HEIGHT,
+			pixels,
+			&bitmap,
+			DIB_RGB_COLORS,
+			SRCCOPY
+		);
+		EndPaint(hwnd, &ps);
+		return 0;
 	}
-	else if (x > max)
+	case WM_DESTROY:
 	{
-		return max;
+		PostQuitMessage(0);
+		return 0;
 	}
-	else
+	default:
 	{
-		return x;
+		return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
 	}
 }
 
-float2 VertexToScreen(float3 vertex, Transform* transform, float2 numPixels)
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
-	float3 worldPoint = transform->ToWorldPoint(vertex);
+	OpenConsole();
+	WNDCLASS wc = {};
+	wc.lpfnWndProc = WndProc;
+	wc.hInstance = hInstance;
+	wc.lpszClassName = L"PixelWindowClass";
+	wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	RegisterClass(&wc);
 
-	float screenHeight_world = 5.0f;
-	float pixelsPerWorldUnit = numPixels.y / screenHeight_world;
+	RECT windowRect = { 0, 0, WIDTH, HEIGHT };
+	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
+	int winWidth = windowRect.right - windowRect.left;
+	int winHeight = windowRect.bottom - windowRect.top;
+	std::cout << winWidth << ", " << winHeight << "\n";
+	HWND hwnd = CreateWindowEx(
+		0,
+		L"PixelWindowClass",
+		L"Pixel Drawing Window",
+		WS_OVERLAPPEDWINDOW,
+		CW_USEDEFAULT, CW_USEDEFAULT, winWidth, winHeight,
+		nullptr, nullptr, hInstance, nullptr
+	);
 
-	float2 pixelOffset = float2(worldPoint.x, worldPoint.y) * pixelsPerWorldUnit;
-
-	return (numPixels / 2.0f) + pixelOffset;
-}
-
-
-
-void Render(Model* model, RenderTarget* renderTarget)
-{
-	//std::cout << renderTarget->Size().ToString() << "\n";
-	for (int i = 0; i < model->points.size(); i+=3)
+	if (!hwnd)
 	{
-		//std::cout << model->points[i + 0].ToString() << " :: " << model->points[i + 1].ToString() << " :: " << model->points[i + 2].ToString() << "\n";
-
-		float2 a = VertexToScreen(model->points[i + 0], model, renderTarget->Size());
-		float2 b = VertexToScreen(model->points[i + 1], model, renderTarget->Size());
-		float2 c = VertexToScreen(model->points[i + 2], model, renderTarget->Size());
-		 
-		//std::cout << a.ToString() << " :: " << b.ToString() << " :: " << c.ToString() << "\n";
-
-		float maxX = LargestOfThree(a.x, b.x, c.x);
-		float minX = SmallestOfThree(a.x, b.x, c.x);
-		float maxY = LargestOfThree(a.y, b.y, c.y);
-		float minY = SmallestOfThree(a.y, b.y, c.y);
-
-		int blockStartX = Clamp((int)minX, 0, renderTarget->width - 1);
-		int blockEndX = Clamp((int)ceilf(maxX), 0, renderTarget->width - 1);
-		int blockStartY = Clamp((int)minY, 0, renderTarget->height - 1);
-		int blockEndY = Clamp((int)ceilf(maxY), 0, renderTarget->height - 1);
-
-
-		
-		for (int y = blockStartY; y <= blockEndY; y++)
-		{
-			for (int x = blockStartX; x <= blockEndX; x++)
-			{
-				if (IsInsideTriangle(a, b, c, float2(x, y)))
-				{
-					renderTarget->SetPixel(x, y, model->triColours[i / 3]);
-				}
-				
-			}
-		}
+		MessageBox(nullptr, L"Faild to create a window", L"Error", MB_ICONERROR);
+		return -1;
 	}
-}
 
-int main()
-{
-	const int width = 800;
-	const int height = 600;
-	
-	Model cube("Models/cube.obj");
-	RenderTarget renderer(width, height);
-	BMPImage bmp(width, height);
+	ShowWindow(hwnd, nCmdShow);
+	UpdateWindow(hwnd);
 
-	for (int i = 0; i < 500; i++)
+	ZeroMemory(&bitmap, sizeof(bitmap));
+	bitmap.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+	bitmap.bmiHeader.biWidth = WIDTH;
+	bitmap.bmiHeader.biHeight = -HEIGHT;
+	bitmap.bmiHeader.biPlanes = 1;
+	bitmap.bmiHeader.biBitCount = 32;
+	bitmap.bmiHeader.biCompression = BI_RGB;
+
+	HDC hdc = GetDC(hwnd);
+	HBITMAP hBitmap = CreateDIBSection(hdc, &bitmap, DIB_RGB_COLORS, &pixels, nullptr, 0);
+	ReleaseDC(hwnd, hdc);
+
+	if (!pixels) {
+		MessageBox(nullptr, L"Failed to allocate pixel buffer", L"Error", MB_ICONERROR);
+		return -1;
+	}
+
+	DrawTestPattern();
+
+	InvalidateRect(hwnd, nullptr, FALSE);
+
+	MSG msg = {};
+	while (GetMessage(&msg, nullptr, 0, 0))
 	{
-		bmp.clear_image();
-		renderer.Clear();
-
-		Render(&cube, &renderer);
-
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				bmp.set_pixel(x, y, renderer.GetPixel(x, y));
-			}
-		}
-		cube.Yaw += 0.1;
-		std::string fileName = "AnimFrames/cube" + std::to_string(i) + ".bmp";
-		bmp.write(fileName.c_str());
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
+
 	return 0;
+
 }
