@@ -131,13 +131,16 @@
     <ClCompile Include="FloatTypes.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Maths.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="App.h" />
     <ClInclude Include="BMPImage.h" />
     <ClInclude Include="FloatTypes.h" />
+    <ClInclude Include="Maths.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="RenderTarget.h" />
     <ClInclude Include="Transform.h" />

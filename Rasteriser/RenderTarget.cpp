@@ -20,10 +20,10 @@ void RenderTarget::Clear()
 
 void RenderTarget::SetPixel(int x, int y, Color col)
 {
-	colorBuffer[y * height + x] = col;
+	colorBuffer[y * width + x] = col;
 }
 
 Color RenderTarget::GetPixel(int x, int y)
 {
-	return colorBuffer[y * height + x];
+	return colorBuffer[y * width + x];
 }

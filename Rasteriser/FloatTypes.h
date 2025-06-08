@@ -107,13 +107,15 @@ public:
 	float z = 0;
 };
 
+
 class Color
 {
 public:
 	Color() { r = 0; b = 0; g = 0; a = 255; }
-	Color(float r1, float g1, float b1, float a1) { r = r1; g = g1; b = b1; a = a1; }
-	float r = 0;
-	float g = 0;
-	float b = 0;
-	float a = 255;
+	Color(int r1, int g1, int b1, int a1) { r = r1; g = g1; b = b1; a = a1; }
+	int32_t ToInt() { return a << 24 | r << 16 | g << 8 | b; }
+	int r = 0;
+	int g = 0;
+	int b = 0;
+	int a = 255;
 };

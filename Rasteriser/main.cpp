@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "App.h"
+
 const int WIDTH = 800;
 const int HEIGHT = 400;
 
@@ -22,24 +24,24 @@ void OpenConsole() {
 		freopen_s(&consoleErr, "CONOUT$", "w", stderr);
 
 		// You can use std::cout, std::cin, and std::cerr directly now
-		std::cout << "Console initialized successfully!" << std::endl;
+		//std::cout << "Console initialized successfully!" << std::endl;
 	}
 	else {
 		std::cerr << "Failed to allocate console." << std::endl;
 	}
 }
 
-void DrawTestPattern()
-{
-	uint32_t* pixelData = (uint32_t*)pixels;
-	for (int y = 0; y < HEIGHT; ++y)
-	{
-		for (int x = 0; x < WIDTH; x++)
-		{
-			pixelData[(y * WIDTH) + x] = 0xFF0000;
-		}
-	}
-}
+//void DrawTestPattern()
+//{
+//	uint32_t* pixelData = (uint32_t*)pixels;
+//	for (int y = 0; y < HEIGHT; ++y)
+//	{
+//		for (int x = 0; x < WIDTH; x++)
+//		{
+//			pixelData[(y * WIDTH) + x] = 0xFF0000;
+//		}
+//	}
+//}
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -58,6 +60,10 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		);
 		EndPaint(hwnd, &ps);
 		return 0;
+	}
+	case WM_ERASEBKGND:
+	{
+		return 1;
 	}
 	case WM_DESTROY:
 	{
@@ -122,17 +128,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 		return -1;
 	}
 
-	DrawTestPattern();
+	//DrawTestPattern();
 
 	InvalidateRect(hwnd, nullptr, FALSE);
 
-	MSG msg = {};
-	while (GetMessage(&msg, nullptr, 0, 0))
-	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
+	App app;
+	app.InitApp(WIDTH, HEIGHT);
 
+	MSG msg = {};
+	bool isRunning = true;
+	while (isRunning)
+	{
+		while (PeekMessage(&msg, hwnd, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT) { isRunning = false; }
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		app.ProcessFrame((uint32_t*)pixels, hwnd);
+	}
 	return 0;
 
 }
