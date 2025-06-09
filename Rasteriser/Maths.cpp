@@ -1,18 +1,26 @@
 #include "Maths.h"
 
 
-bool Maths::IsOnRightSideOfLine(float2 a, float2 b, float2 p)
+float Maths::SignedTriangleArea(float2 a, float2 b, float2 c)
 {
-	float2 ap = p - a;
+	float2 ac = c - a;
 	float2 abPerp = (b - a).Perpendicular();
-	return ap.Dot(abPerp) >= 0;
+	return ac.Dot(abPerp) / 2.0f;
 }
-bool Maths::IsInsideTriangle(float2 a, float2 b, float2 c, float2 p)
+
+bool Maths::IsInsideTriangle(float2 a, float2 b, float2 c, float2 p, float3* outputWeights)
 {
-	bool sideAB = IsOnRightSideOfLine(a, b, p);
-	bool sideBC = IsOnRightSideOfLine(b, c, p);
-	bool sideCA = IsOnRightSideOfLine(c, a, p);
-	return sideAB && sideBC && sideCA;
+	float areaABP = SignedTriangleArea(a, b, p);
+	float areaBCP = SignedTriangleArea(b, c, p);
+	float areaCAP = SignedTriangleArea(c, a, p);
+	bool inTri = (areaABP >= 0 && areaBCP >= 0 && areaCAP >= 0);
+
+	float invAreaSum = 1 / (areaABP + areaBCP + areaCAP);
+	outputWeights->x = areaBCP * invAreaSum;
+	outputWeights->y = areaCAP * invAreaSum;
+	outputWeights->z = areaABP * invAreaSum;
+
+	return inTri;
 }
 
 float Maths::LargestOfThree(float a, float b, float c)

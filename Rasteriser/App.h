@@ -6,25 +6,33 @@
 #include "Model.h"
 #include "RenderTarget.h"
 #include "Maths.h"
+#include "Camera.h"
+#include "InputManager.h"
 
 class App
 {
 	//windows application stuff
 public:
-	void InitApp(int WIDTH, int HEIGHT);
-	void ProcessFrame(uint32_t* frameBuffer, HWND hwnd);
+	App(int w, int h, InputManager* inputs);
+	void InitApp(int WIDTH, int HEIGHT, InputManager* inputs);
+	void ProcessFrame(uint32_t* frameBuffer, HWND hwnd, float dt);
 	void WriteToBuffer(uint32_t* frameBuffer);
 
 private:
-	int width;
-	int height;
+	int width = 0;
+	int height = 0;
+	float mouseSens = 2;
 
 	//my program stuff
 public:
+	void Update(float deltaTime);
+	void HandleInput(float deltaTime);
 	void Render(Model* model, RenderTarget* renderTarget);
-	float2 VertexToScreen(float3 vertex, Transform* transform, float2 numPixels, float fov);
+	float3 VertexToScreen(float3 vertex, Transform* transform, float2 numPixels, float fov);
 
 private:
+	InputManager* inputManager;
+	Camera camera;
 	Model* cube;
 	RenderTarget* renderer;
 };

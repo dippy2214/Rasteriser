@@ -4,12 +4,14 @@
 #include <fstream>
 
 #include "App.h"
+#include "InputManager.h"
 
 const int WIDTH = 800;
 const int HEIGHT = 400;
 
 BITMAPINFO bitmap;
 void* pixels = nullptr;
+InputManager inputManager;
 
 void OpenConsole() {
 	if (AllocConsole()) {
@@ -61,6 +63,31 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		EndPaint(hwnd, &ps);
 		return 0;
 	}
+	case WM_KEYDOWN:
+	{
+		inputManager.OnKeyDown(wParam);
+		return 0;
+	}
+	case WM_KEYUP:
+	{
+		inputManager.OnKeyUp(wParam);
+		return 0;
+	}
+	case WM_MOUSEMOVE:
+	{
+		inputManager.OnMouseMove((int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam));
+		return 0;
+	}
+	case WM_LBUTTONDOWN:
+	{
+		inputManager.OnLeftMouseButtonDown();
+		return 0;
+	}
+	case WM_LBUTTONUP:
+	{
+		inputManager.OnLeftMouseButtonUp();
+		return 0;
+	}
 	case WM_ERASEBKGND:
 	{
 		return 1;
@@ -79,7 +106,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
+	srand(time(0));
 	OpenConsole();
+
 	WNDCLASS wc = {};
 	wc.lpfnWndProc = WndProc;
 	wc.hInstance = hInstance;
@@ -128,24 +157,36 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 		return -1;
 	}
 
-	//DrawTestPattern();
+	LARGE_INTEGER freq;
+	LARGE_INTEGER previousTime;
+	LARGE_INTEGER currentTime;
+	double deltaTime;
+	
+	QueryPerformanceFrequency(&freq);
+	QueryPerformanceCounter(&previousTime);
+	QueryPerformanceCounter(&currentTime);
 
 	InvalidateRect(hwnd, nullptr, FALSE);
 
-	App app;
-	app.InitApp(WIDTH, HEIGHT);
+	App app(WIDTH, HEIGHT, &inputManager);
+	
 
 	MSG msg = {};
 	bool isRunning = true;
 	while (isRunning)
 	{
+		inputManager.Update();
 		while (PeekMessage(&msg, hwnd, 0, 0, PM_REMOVE))
 		{
 			if (msg.message == WM_QUIT) { isRunning = false; }
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		app.ProcessFrame((uint32_t*)pixels, hwnd);
+		QueryPerformanceCounter(&currentTime);
+
+		deltaTime = static_cast<float>(currentTime.QuadPart - previousTime.QuadPart) / static_cast<float>(freq.QuadPart);
+		previousTime = currentTime;
+		app.ProcessFrame((uint32_t*)pixels, hwnd, deltaTime);
 	}
 	return 0;
 

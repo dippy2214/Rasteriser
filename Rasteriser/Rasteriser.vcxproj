@@ -128,8 +128,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="BMPImage.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="FloatTypes.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Maths.cpp" />
     <ClCompile Include="Model.cpp" />
@@ -139,7 +141,9 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="BMPImage.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="FloatTypes.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="RenderTarget.h" />

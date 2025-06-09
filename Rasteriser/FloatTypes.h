@@ -90,7 +90,24 @@ public:
 		result.z /= x1;
 		return result;
 	}
+	void operator+=(float3 const& obj) 
+	{
+		x += obj.x;
+		y += obj.y;
+		z += obj.z;
+	}
+	void operator-=(float3 const& obj)
+	{
+		x -= obj.x;
+		y -= obj.y;
+		z -= obj.z;
+	}
+	friend float3 operator/(float f, float3 f3)
+	{
+		return float3(f / f3.x, f / f3.y, f / f3.z);
+	}
 
+	float2 xy() { return float2(x, y); }
 	std::string ToString()
 	{
 		std::string output;
@@ -100,6 +117,13 @@ public:
 		output += ", ";
 		output += std::to_string(z);
 		return output;
+	}
+
+	float Dot(float3 b) { return (x * b.x) + (y * b.y) + (z * b.z); }
+	float3 Normalised() { 
+		float length = sqrt((x * x) + (y * y) + (z * z));
+		if (length == 0) { return float3(0, 0, 0); }
+		return float3(x / length, y / length, z / length);
 	}
 
 	float x = 0;

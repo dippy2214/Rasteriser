@@ -10,22 +10,33 @@
 #include "RenderTarget.h"
 #include "Maths.h"
 #include "App.h"
+#include "Transform.h"
 
 
-void App::InitApp(int WIDTH, int HEIGHT)
+App::App(int w, int h, InputManager* inputManager)
+{
+	InitApp(w, h, inputManager);
+}
+
+void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs)
 {
 	width = WIDTH;
 	height = HEIGHT;
+	inputManager = inputs;
 
-	cube = new Model("Models/cube.obj");
-	cube->position = float3(0, 0, 4);
+	cube = new Model("Models/evilmonkey.obj");
+	cube->position = float3(0, 0, 15);
 	renderer = new RenderTarget(width, height);
+
+	camera.position = float3(0, 2, 0);
 }
 
-void App::ProcessFrame(uint32_t* frameBuffer, HWND hwnd)
+void App::ProcessFrame(uint32_t* frameBuffer, HWND hwnd, float dt)
 {
 	renderer->Clear();
-	
+
+	Update(dt);
+	HandleInput(dt);
 	Render(cube, renderer);
 
 	WriteToBuffer(frameBuffer);
@@ -46,58 +57,72 @@ void App::WriteToBuffer(uint32_t* frameBuffer)
 }
 
 
-float2 App::VertexToScreen(float3 vertex, Transform* transform, float2 numPixels, float fov)
+float3 App::VertexToScreen(float3 vertex, Transform* transform, float2 numPixels, float fov)
 {
 	float3 worldPoint = transform->ToWorldPoint(vertex);
+	float3 viewPoint = camera.ToLocalPoint(worldPoint);
 
-	float3 camPoint = worldPoint;
+	float screenHeight_world = tan(fov / 2) * 2;
+	float pixelsPerWorldUnit = numPixels.y / screenHeight_world / viewPoint.z;
 
-	if (camPoint.z <= 0.0f)
-	{
-		return float2(-1000, -1000);
-	}
+	float2 pixelOffset = float2(viewPoint.x, viewPoint.y) * pixelsPerWorldUnit;
+	float2 screenPoint = numPixels / 2 + pixelOffset;
 
-	float viewX = camPoint.x / -camPoint.z;
-	float viewY = camPoint.y / -camPoint.z;
-
-	float tanHalfFOV = tanf(fov * 0.5);
-	float aspectRatio = numPixels.x / numPixels.y;
-
-	float ndcX = viewX / (tanHalfFOV * aspectRatio);
-	float ndcY = viewY / tanHalfFOV;
-
-	//float screenHeight_world = tanf(fov/2.0f)*2.0f;
-	//float pixelsPerWorldUnit = numPixels.y / screenHeight_world / worldPoint.z;
-
-	//float2 pixelOffset = float2(worldPoint.x, worldPoint.y) * pixelsPerWorldUnit;
-	//return (numPixels / 2.0f) + pixelOffset;
-
-	float2 screenPos;
-	screenPos.x = (ndcX + 1.0f) * 0.5f * numPixels.x;
-	screenPos.y = (ndcY + 1.0f) * 0.5f * numPixels.y;
-
-	return screenPos;
+	return float3(screenPoint.x, screenPoint.y, viewPoint.z);
 }
 
 
+
+void App::Update(float deltaTime)
+{
+	//cube->Yaw += 3*deltaTime;
+	//cube->Pitch += 2*deltaTime;
+
+}
+
+void App::HandleInput(float deltaTime)
+{
+	Transform::BasisVectors camVecs = camera.GetBasisVectors();
+	float3 camMoveDelta;
+
+	
+	if (inputManager->isLeftMouseDown())
+	{
+		float2 mouseDelta = inputManager->GetMouseDragDelta() / renderer->Size().x * mouseSens;
+		camera.Pitch += mouseDelta.y;
+		camera.Yaw -= mouseDelta.x;
+	}
+
+	if (inputManager->IsKeyPressed('W')) { camMoveDelta += camVecs.khat; }
+	if (inputManager->IsKeyPressed('S')) { camMoveDelta -= camVecs.khat; }
+	if (inputManager->IsKeyPressed('A')) { camMoveDelta += camVecs.ihat; }
+	if (inputManager->IsKeyPressed('D')) { camMoveDelta -= camVecs.ihat; }
+	if (inputManager->IsKeyPressed('Q')) { camMoveDelta += camVecs.jhat; }
+	if (inputManager->IsKeyPressed('E')) { camMoveDelta -= camVecs.jhat; }
+
+
+	camera.position += camMoveDelta.Normalised() * camera.camSpeed * deltaTime;
+}
 
 void App::Render(Model* model, RenderTarget* renderTarget)
 {
 	for (int i = 0; i < model->points.size(); i += 3)
 	{
-		float2 a = VertexToScreen(model->points[i + 0], model, renderTarget->Size(), 30.0f);
-		float2 b = VertexToScreen(model->points[i + 1], model, renderTarget->Size(), 30.0f);
-		float2 c = VertexToScreen(model->points[i + 2], model, renderTarget->Size(), 30.0f);
+		float2 screenSize = renderTarget->Size();
+		float3 a = VertexToScreen(model->points[i + 0], model, renderTarget->Size(), 30.0f);
+		float3 b = VertexToScreen(model->points[i + 1], model, renderTarget->Size(), 30.0f);
+		float3 c = VertexToScreen(model->points[i + 2], model, renderTarget->Size(), 30.0f);
+		if (a.z <= 0 || b.z <= 0 || c.z <= 0) { continue; }
 		 
 		float maxX = Maths::LargestOfThree(a.x, b.x, c.x);
 		float minX = Maths::SmallestOfThree(a.x, b.x, c.x);
 		float maxY = Maths::LargestOfThree(a.y, b.y, c.y);
 		float minY = Maths::SmallestOfThree(a.y, b.y, c.y);
 
-		int blockStartX = Maths::Clamp((int)minX, 0, renderTarget->width - 1);
-		int blockEndX = Maths::Clamp((int)ceilf(maxX), 0, renderTarget->width - 1);
-		int blockStartY = Maths::Clamp((int)minY, 0, renderTarget->height - 1);
-		int blockEndY = Maths::Clamp((int)ceilf(maxY), 0, renderTarget->height - 1);
+		int blockStartX = Maths::Clamp((int)minX, 0, screenSize.x - 1);
+		int blockEndX = Maths::Clamp((int)ceilf(maxX), 0, screenSize.x - 1);
+		int blockStartY = Maths::Clamp((int)minY, 0, screenSize.y - 1);
+		int blockEndY = Maths::Clamp((int)ceilf(maxY), 0, screenSize.y - 1);
 
 
 		
@@ -105,15 +130,21 @@ void App::Render(Model* model, RenderTarget* renderTarget)
 		{
 			for (int x = blockStartX; x <= blockEndX; x++)
 			{
-				if (Maths::IsInsideTriangle(a, b, c, float2(x, y)))
+				float2 p(x, y);
+				float3 triWeights;
+
+				if (Maths::IsInsideTriangle(a.xy(), b.xy(), c.xy(), p, &triWeights))
 				{
+					float3 depths(a.z, b.z, c.z);
+					float depth = 1/((1.0f/depths).Dot(triWeights));
+					//std::cout << depth << "\n";
+					if (depth > renderTarget->GetDepth(x, y)) { continue; }
+				
 					renderTarget->SetPixel(x, y, model->triColours[i / 3]);
+					renderTarget->SetDepth(x, y, depth);
 				}
 			}
 		}
 	}
-	cube->Yaw += 0.03;
-	cube->Pitch += 0.02;
-	//std::cout << cube->Yaw << "\n";
 }
 

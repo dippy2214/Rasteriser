@@ -11,6 +11,8 @@ Model::Model(std::string fileName)
 	{
 		triColours.emplace_back(Color(rand() % 255, rand() % 255, rand() % 255, 255.0f));
 	}
+	//std::cout << "model points: " << points.size() << "\n";
+	//std::cout << "model colors: " << triColours.size() << ". Expected: " << points.size() / 3 << "\n";
 }
 
 float3 Model::ParsePoints(std::string str)
@@ -72,19 +74,20 @@ std::vector<int> Model::ParseFaces(std::string str)
 
 	for (int i = 0; i < faceIndexGroups.size(); i++)
 	{
-		
-		output.emplace_back(std::atoi(faceIndexGroups[i].substr(0, 1).c_str())-1);
+		int slashIndex = faceIndexGroups[i].find("/");
+		output.emplace_back(std::atoi(faceIndexGroups[i].substr(0, slashIndex).c_str())-1);
 		//std::cout << std::atoi(faceIndexGroups[i].substr(0, pos).c_str()) - 1 << "\n";
-		if (i >= 3)
+		if (i > 2)
 		{
-			output.emplace_back(output[output.size() - (3 * i - 6)]);
-			output.emplace_back(output.size() - 2);
+			output.emplace_back(output[output.size() - 1 - (3 * i - 6)]);
+			output.emplace_back(output[output.size() - 3]);
 		}
 	}
 	/*for (int i = 0; i < output.size(); i++)
 	{
-		std::cout << output[i] << "\n";
+		std::cout << output[i] << ", ";
 	}*/
+	std::cout << "\n";
 	return output;
 }
 
