@@ -22,7 +22,7 @@ private:
 	//my program stuff
 public:
 	void Render(Model* model, RenderTarget* renderTarget);
-	float2 VertexToScreen(float3 vertex, Transform* transform, float2 numPixels);
+	float2 VertexToScreen(float3 vertex, Transform* transform, float2 numPixels, float fov);
 
 private:
 	Model* cube;
