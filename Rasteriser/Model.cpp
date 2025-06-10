@@ -47,6 +47,33 @@ float3 Model::ParsePoints(std::string str)
 	return output;
 }
 
+float2 Model::ParseTextureCoords(std::string str)
+{
+	float2 output;
+	std::string del = " ";
+	int it = 0;
+	str.erase(0, 3);
+	auto pos = str.find(del);
+	while (pos != std::string::npos)
+	{
+		switch (it)
+		{
+		case 0:
+			output.x = std::atof(str.substr(0, pos).c_str());
+			break;
+		default:
+			std::cout << str << "\n" << it << "\n";
+			throw std::runtime_error("unexpected amount of data in vertex");
+		}
+		str.erase(0, pos + del.length());
+		pos = str.find(del);
+		it++;
+	}
+	output.y = std::atof(str.c_str());
+	std::cout << output.ToString() << std::endl;
+	return output;
+}
+
 std::vector<int> Model::ParseFaces(std::string str)
 {
 	std::vector<int> output;
@@ -87,7 +114,7 @@ std::vector<int> Model::ParseFaces(std::string str)
 	{
 		std::cout << output[i] << ", ";
 	}*/
-	std::cout << "\n";
+	//std::cout << "\n";
 	return output;
 }
 
@@ -110,6 +137,11 @@ std::vector<float3> Model::LoadObjFile(std::string fileName)
 			float3 point = ParsePoints(storedFileContent);
 			allPoints.emplace_back(point);
 			
+		}
+		else if (storedFileContent.substr(0, 3) == "vt ")
+		{
+			float2 UV = ParseTextureCoords(storedFileContent);
+			textureCoords.emplace_back(UV);
 		}
 		else if (storedFileContent.substr(0, 2) == "f ")
 		{

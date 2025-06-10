@@ -97,8 +97,9 @@ void App::HandleInput(float deltaTime)
 	if (inputManager->IsKeyPressed('S')) { camMoveDelta -= camVecs.khat; }
 	if (inputManager->IsKeyPressed('A')) { camMoveDelta += camVecs.ihat; }
 	if (inputManager->IsKeyPressed('D')) { camMoveDelta -= camVecs.ihat; }
-	if (inputManager->IsKeyPressed('Q')) { camMoveDelta += camVecs.jhat; }
-	if (inputManager->IsKeyPressed('E')) { camMoveDelta -= camVecs.jhat; }
+	if (inputManager->IsKeyPressed('E')) { camMoveDelta += camVecs.jhat; }
+	if (inputManager->IsKeyPressed('Q')) { camMoveDelta -= camVecs.jhat; }
+	
 
 
 	camera.position += camMoveDelta.Normalised() * camera.camSpeed * deltaTime;
@@ -112,6 +113,7 @@ void App::Render(Model* model, RenderTarget* renderTarget)
 		float3 a = VertexToScreen(model->points[i + 0], model, renderTarget->Size(), 30.0f);
 		float3 b = VertexToScreen(model->points[i + 1], model, renderTarget->Size(), 30.0f);
 		float3 c = VertexToScreen(model->points[i + 2], model, renderTarget->Size(), 30.0f);
+
 		if (a.z <= 0 || b.z <= 0 || c.z <= 0) { continue; }
 		 
 		float maxX = Maths::LargestOfThree(a.x, b.x, c.x);
@@ -124,8 +126,6 @@ void App::Render(Model* model, RenderTarget* renderTarget)
 		int blockStartY = Maths::Clamp((int)minY, 0, screenSize.y - 1);
 		int blockEndY = Maths::Clamp((int)ceilf(maxY), 0, screenSize.y - 1);
 
-
-		
 		for (int y = blockStartY; y <= blockEndY; y++)
 		{
 			for (int x = blockStartX; x <= blockEndX; x++)
@@ -133,16 +133,15 @@ void App::Render(Model* model, RenderTarget* renderTarget)
 				float2 p(x, y);
 				float3 triWeights;
 
-				if (Maths::IsInsideTriangle(a.xy(), b.xy(), c.xy(), p, &triWeights))
-				{
-					float3 depths(a.z, b.z, c.z);
-					float depth = 1/((1.0f/depths).Dot(triWeights));
-					//std::cout << depth << "\n";
-					if (depth > renderTarget->GetDepth(x, y)) { continue; }
+				if (!Maths::IsInsideTriangle(a.xy(), b.xy(), c.xy(), p, &triWeights)) { continue; }
+					
+				float3 depths(a.z, b.z, c.z);
+				float depth = 1/((1.0f/depths).Dot(triWeights));
+
+				if (depth > renderTarget->GetDepth(x, y)) { continue; }
 				
-					renderTarget->SetPixel(x, y, model->triColours[i / 3]);
-					renderTarget->SetDepth(x, y, depth);
-				}
+				renderTarget->SetPixel(x, y, model->triColours[i / 3]);
+				renderTarget->SetDepth(x, y, depth);
 			}
 		}
 	}
