@@ -169,7 +169,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 	InvalidateRect(hwnd, nullptr, FALSE);
 
 	App app(WIDTH, HEIGHT, &inputManager);
-	
 
 	MSG msg = {};
 	bool isRunning = true;

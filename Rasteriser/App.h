@@ -27,8 +27,9 @@ private:
 public:
 	void Update(float deltaTime);
 	void HandleInput(float deltaTime);
-	void Render(Model* model, RenderTarget* renderTarget);
-	float3 VertexToScreen(float3 vertex, Transform* transform, float2 numPixels, float fov);
+	void Render();
+	/*void Render(Model* model, RenderTarget* renderTarget);
+	float3 VertexToScreen(float3 vertex, Transform* transform, float2 numPixels, float fov);*/
 
 private:
 	InputManager* inputManager;

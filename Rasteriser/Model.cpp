@@ -1,4 +1,6 @@
 #include "Model.h"
+#include "Maths.h"
+
 #include <sstream>
 #include <iostream>
 #include <fstream>
@@ -11,8 +13,6 @@ Model::Model(std::string fileName)
 	{
 		triColours.emplace_back(Color(rand() % 255, rand() % 255, rand() % 255, 255.0f));
 	}
-	//std::cout << "model points: " << points.size() << "\n";
-	//std::cout << "model colors: " << triColours.size() << ". Expected: " << points.size() / 3 << "\n";
 }
 
 float3 Model::ParsePoints(std::string str)
@@ -22,7 +22,7 @@ float3 Model::ParsePoints(std::string str)
 	int it = 0;
 	str.erase(0, 2);
 	auto pos = str.find(del);
-	//std::cout << str << "\n";
+
 	while (pos != std::string::npos)
 	{
 		switch (it)
@@ -42,7 +42,6 @@ float3 Model::ParsePoints(std::string str)
 		it++;
 	}
 	output.z = std::atof(str.c_str());
-	//std::cout << output.ToString() << "\n";
 
 	return output;
 }
@@ -88,33 +87,22 @@ std::vector<int> Model::ParseFaces(std::string str)
 	{
 		faceIndexGroups.emplace_back(str.substr(0, pos));
 		str.erase(0, pos + del.length());
-		//std::cout << pos << "\n";
 		pos = str.find(del);
 		
 	}
 	faceIndexGroups.emplace_back(str);
 
-	/*for (int i = 0; i < faceIndexGroups.size(); i++)
-	{
-		std::cout << faceIndexGroups[i] << "\n";
-	}*/
-
 	for (int i = 0; i < faceIndexGroups.size(); i++)
 	{
 		int slashIndex = faceIndexGroups[i].find("/");
 		output.emplace_back(std::atoi(faceIndexGroups[i].substr(0, slashIndex).c_str())-1);
-		//std::cout << std::atoi(faceIndexGroups[i].substr(0, pos).c_str()) - 1 << "\n";
 		if (i > 2)
 		{
 			output.emplace_back(output[output.size() - 1 - (3 * i - 6)]);
 			output.emplace_back(output[output.size() - 3]);
 		}
 	}
-	/*for (int i = 0; i < output.size(); i++)
-	{
-		std::cout << output[i] << ", ";
-	}*/
-	//std::cout << "\n";
+
 	return output;
 }
 
@@ -153,10 +141,47 @@ std::vector<float3> Model::LoadObjFile(std::string fileName)
 		}
 	}
 
-	/*for (int i = 0; i < trianglePoints.size(); i++)
-	{
-		std::cout << trianglePoints[i].ToString() << "\n";
-	}*/
-
 	return trianglePoints;
+}
+
+void Model::Render(RenderTarget* renderTarget, Camera* cam)
+{
+	for (int i = 0; i < points.size(); i += 3)
+	{
+		float2 screenSize = renderTarget->Size();
+		float3 a = cam->VertexToScreen(points[i + 0], this, renderTarget->Size());
+		float3 b = cam->VertexToScreen(points[i + 1], this, renderTarget->Size());
+		float3 c = cam->VertexToScreen(points[i + 2], this, renderTarget->Size());
+
+		if (a.z <= 0 || b.z <= 0 || c.z <= 0) { continue; }
+
+		float maxX = Maths::LargestOfThree(a.x, b.x, c.x);
+		float minX = Maths::SmallestOfThree(a.x, b.x, c.x);
+		float maxY = Maths::LargestOfThree(a.y, b.y, c.y);
+		float minY = Maths::SmallestOfThree(a.y, b.y, c.y);
+
+		int blockStartX = Maths::Clamp((int)minX, 0, screenSize.x - 1);
+		int blockEndX = Maths::Clamp((int)ceilf(maxX), 0, screenSize.x - 1);
+		int blockStartY = Maths::Clamp((int)minY, 0, screenSize.y - 1);
+		int blockEndY = Maths::Clamp((int)ceilf(maxY), 0, screenSize.y - 1);
+
+		for (int y = blockStartY; y <= blockEndY; y++)
+		{
+			for (int x = blockStartX; x <= blockEndX; x++)
+			{
+				float2 p(x, y);
+				float3 triWeights;
+
+				if (!Maths::IsInsideTriangle(a.xy(), b.xy(), c.xy(), p, &triWeights)) { continue; }
+
+				float3 depths(a.z, b.z, c.z);
+				float depth = 1 / ((1.0f / depths).Dot(triWeights));
+
+				if (depth > renderTarget->GetDepth(x, y)) { continue; }
+
+				renderTarget->SetPixel(x, y, triColours[i / 3]);
+				renderTarget->SetDepth(x, y, depth);
+			}
+		}
+	}
 }

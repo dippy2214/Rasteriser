@@ -9,5 +9,6 @@ public:
 
 	void Update();
 	float3 ToLocalPoint(float3 worldPoint);
+	float3 VertexToScreen(float3 vertex, Transform* transform, float2 numPixels);
 };
 
