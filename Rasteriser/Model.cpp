@@ -205,9 +205,10 @@ void Model::Render(RenderTarget* renderTarget, Camera* cam)
 				else
 				{
 					float2 textureCoord;
-					textureCoord += textureCoords[i + 0] * triWeights.x;
-					textureCoord += textureCoords[i + 1] * triWeights.y;
-					textureCoord += textureCoords[i + 2] * triWeights.z;
+					textureCoord += textureCoords[i + 0] / depths.x * triWeights.x;
+					textureCoord += textureCoords[i + 1] / depths.y * triWeights.y;
+					textureCoord += textureCoords[i + 2] / depths.z * triWeights.z;
+					textureCoord *= depth;
 
 					renderTarget->SetPixel(x, y, modelTexure->get_pixel(textureCoord.x, textureCoord.y));
 					renderTarget->SetDepth(x, y, depth);

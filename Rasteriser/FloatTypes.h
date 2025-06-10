@@ -44,6 +44,16 @@ public:
 		x -= obj.x;
 		y -= obj.y;
 	}
+	void operator*=(float const& x1)
+	{
+		x *= x1;
+		y *= x1;
+	}
+	void operator/=(float const& x1)
+	{
+		x /= x1;
+		y /= x1;
+	}
 
 	std::string ToString()
 	{
@@ -112,6 +122,19 @@ public:
 		y -= obj.y;
 		z -= obj.z;
 	}
+	void operator*=(float const& x1)
+	{
+		x *= x1;
+		y *= x1;
+		z *= x1;
+	}
+	void operator/=(float const& x1)
+	{
+		x /= x1;
+		y /= x1;
+		z /= x1;
+	}
+
 	friend float3 operator/(float f, float3 f3)
 	{
 		return float3(f / f3.x, f / f3.y, f / f3.z);
