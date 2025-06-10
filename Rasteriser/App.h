@@ -15,8 +15,9 @@ class App
 public:
 	App(int w, int h, InputManager* inputs);
 	void InitApp(int WIDTH, int HEIGHT, InputManager* inputs);
-	void ProcessFrame(uint32_t* frameBuffer, HWND hwnd, float dt);
+	void ProcessFrame(uint32_t* frameBuffer, HWND viewPort, float dt);
 	void WriteToBuffer(uint32_t* frameBuffer);
+	void UpdateViewport(HWND viewPort);
 
 private:
 	int width = 0;

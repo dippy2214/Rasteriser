@@ -19,7 +19,6 @@ private:
 	float2 ParseTextureCoords(std::string str);
 	std::vector<int> ParseFaces(std::string str);
 	
-
 	std::vector<float3> points;
 	std::vector<float2> textureCoords;
 	std::vector<Color> triColours;
