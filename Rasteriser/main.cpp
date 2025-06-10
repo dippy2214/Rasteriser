@@ -168,7 +168,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
 	InvalidateRect(hwnd, nullptr, FALSE);
 
-	App app(WIDTH, HEIGHT, &inputManager);
+	App app(WIDTH, HEIGHT, &inputManager, (uint32_t*)pixels);
 
 	MSG msg = {};
 	bool isRunning = true;
@@ -185,7 +185,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
 		deltaTime = static_cast<float>(currentTime.QuadPart - previousTime.QuadPart) / static_cast<float>(freq.QuadPart);
 		previousTime = currentTime;
-		app.ProcessFrame((uint32_t*)pixels, hwnd, deltaTime);
+		app.ProcessFrame(hwnd, deltaTime);
 	}
 	return 0;
 

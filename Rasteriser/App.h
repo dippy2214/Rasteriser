@@ -13,10 +13,9 @@ class App
 {
 	//windows application stuff
 public:
-	App(int w, int h, InputManager* inputs);
-	void InitApp(int WIDTH, int HEIGHT, InputManager* inputs);
-	void ProcessFrame(uint32_t* frameBuffer, HWND viewPort, float dt);
-	void WriteToBuffer(uint32_t* frameBuffer);
+	App(int w, int h, InputManager* inputs, uint32_t* frameBuffer);
+	void InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* pixelBuffer);
+	void ProcessFrame(HWND viewPort, float dt);
 	void UpdateViewport(HWND viewPort);
 
 private:
@@ -29,8 +28,6 @@ public:
 	void Update(float deltaTime);
 	void HandleInput(float deltaTime);
 	void Render();
-	/*void Render(Model* model, RenderTarget* renderTarget);
-	float3 VertexToScreen(float3 vertex, Transform* transform, float2 numPixels, float fov);*/
 
 private:
 	InputManager* inputManager;

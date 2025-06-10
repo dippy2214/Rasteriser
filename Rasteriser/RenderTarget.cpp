@@ -1,10 +1,11 @@
 #include "RenderTarget.h"
+#include "Maths.h"
 
-RenderTarget::RenderTarget(int w, int h)
+RenderTarget::RenderTarget(int w, int h, uint32_t* renderTarget)
 {
 	width = w; 
 	height = h; 
-	colorBuffer = new Color [width * height];
+	colorBuffer = renderTarget;
 	depthBuffer = new float[width * height];
 }
 
@@ -22,12 +23,22 @@ void RenderTarget::Clear()
 
 void RenderTarget::SetPixel(int x, int y, Color col)
 {
-	colorBuffer[y * width + x] = col;
+	int red = Maths::Clamp(static_cast<int>(col.r), 0, 255);
+	int green = Maths::Clamp(static_cast<int>(col.g), 0, 255);
+	int blue = Maths::Clamp(static_cast<int>(col.b), 0, 255);
+	int alpha = Maths::Clamp(static_cast<int>(col.a), 0, 255);
+	uint32_t intCol = alpha << 24 | red << 16 | green << 8 | blue;
+	colorBuffer[y * width + x] = intCol;
 }
 
 Color RenderTarget::GetPixel(int x, int y)
 {
-	return colorBuffer[y * width + x];
+	Color pixelColor;
+	pixelColor.r = static_cast<uint32_t>(colorBuffer[y * width + x] && redMask);
+	pixelColor.g = static_cast<uint32_t>(colorBuffer[y * width + x] && greenMask);
+	pixelColor.b = static_cast<uint32_t>(colorBuffer[y * width + x] && blueMask);
+	pixelColor.a = static_cast<uint32_t>(colorBuffer[y * width + x] && alphaMask);
+	return pixelColor;
 }
 
 void RenderTarget::SetDepth(int x, int y, float depthVal)

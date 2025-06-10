@@ -1,4 +1,5 @@
 #include "BMPImage.h"
+#include "Maths.h"
 #include <iostream>
 #include <fstream>
 
@@ -213,6 +214,25 @@ void BMPImage::set_pixel(float x, float y, Color color)
             data[channels * (y * info_header.width + x) + 3] = color.a;
         }
     }
+}
+
+Color BMPImage::get_pixel(float x, float y)
+{
+    int channels = info_header.bit_count / 8;
+    int texX = Maths::Clamp(info_header.width * x, 0, info_header.width);
+    int texY = Maths::Clamp(info_header.height * y, 0, info_header.height);
+
+    //std::cout << texX << ", " << texY << "\n";
+    Color output(0,0,0,255);
+    output.b = data[channels * (texY * info_header.width + texX) + 0];
+    output.g = data[channels * (texY * info_header.width + texX) + 1];
+    output.r = data[channels * (texY * info_header.width + texX) + 2];
+    if (channels == 4)
+    {
+        output.a = data[channels * (texY * info_header.width + texX) + 3];
+    }
+
+    return output;
 }
 
 void BMPImage::clear_image()

@@ -34,6 +34,16 @@ public:
 		result.y /= x1;
 		return result;
 	}
+	void operator+=(float2 const& obj)
+	{
+		x += obj.x;
+		y += obj.y;
+	}
+	void operator-=(float2 const& obj)
+	{
+		x -= obj.x;
+		y -= obj.y;
+	}
 
 	std::string ToString()
 	{

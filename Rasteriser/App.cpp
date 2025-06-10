@@ -13,25 +13,25 @@
 #include "Transform.h"
 
 
-App::App(int w, int h, InputManager* inputManager)
+App::App(int w, int h, InputManager* inputManager, uint32_t* frameBuffer)
 {
-	InitApp(w, h, inputManager);
+	InitApp(w, h, inputManager, frameBuffer);
 }
 
-void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs)
+void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBuffer)
 {
 	width = WIDTH;
 	height = HEIGHT;
 	inputManager = inputs;
 
-	cube = new Model("Models/evilmonkey.obj");
+	cube = new Model("Models/evilmonkey.obj", "Textures/evilmonkeytexture.bmp");
 	cube->position = float3(0, 0, 15);
-	renderer = new RenderTarget(width, height);
+	renderer = new RenderTarget(width, height, frameBuffer);
 
 	camera.position = float3(0, 2, 0);
 }
 
-void App::ProcessFrame(uint32_t* frameBuffer, HWND viewPort, float dt)
+void App::ProcessFrame(HWND viewPort, float dt)
 {
 	renderer->Clear();
 
@@ -39,19 +39,7 @@ void App::ProcessFrame(uint32_t* frameBuffer, HWND viewPort, float dt)
 	HandleInput(dt);
 	Render();
 
-	WriteToBuffer(frameBuffer);
 	UpdateViewport(viewPort);
-}
-
-void App::WriteToBuffer(uint32_t* frameBuffer)
-{
-	for (int y = 0; y < height; y++)
-	{
-		for (int x = 0; x < width; x++)
-		{
-			frameBuffer[y * width + x] = renderer->GetPixel(x, y).ToInt();
-		}
-	}
 }
 
 void App::UpdateViewport(HWND viewPort)

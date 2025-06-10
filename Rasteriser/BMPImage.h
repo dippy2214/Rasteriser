@@ -58,6 +58,7 @@ public:
     void write(const char* fname);
 
     void set_pixel(float x, float y, Color color);
+    Color get_pixel(float x, float y);
     void clear_image();
 private:
 

@@ -13,6 +13,14 @@ Model::Model(std::string fileName)
 	{
 		triColours.emplace_back(Color(rand() % 255, rand() % 255, rand() % 255, 255.0f));
 	}
+	hasTexture = false;
+}
+
+Model::Model(std::string fileName, std::string textureFileName)
+{
+	points = LoadObjFile(fileName);
+	modelTexure = new BMPImage(textureFileName.c_str());
+	hasTexture = true;
 }
 
 float3 Model::ParsePoints(std::string str)
@@ -53,29 +61,17 @@ float2 Model::ParseTextureCoords(std::string str)
 	int it = 0;
 	str.erase(0, 3);
 	auto pos = str.find(del);
-	while (pos != std::string::npos)
-	{
-		switch (it)
-		{
-		case 0:
-			output.x = std::atof(str.substr(0, pos).c_str());
-			break;
-		default:
-			std::cout << str << "\n" << it << "\n";
-			throw std::runtime_error("unexpected amount of data in vertex");
-		}
-		str.erase(0, pos + del.length());
-		pos = str.find(del);
-		it++;
-	}
+
+	output.x = std::atof(str.substr(0, pos).c_str());
+	str.erase(0, pos + del.length());
 	output.y = std::atof(str.c_str());
-	std::cout << output.ToString() << std::endl;
+
 	return output;
 }
 
-std::vector<int> Model::ParseFaces(std::string str)
+std::vector<PointData> Model::ParseFaces(std::string str)
 {
-	std::vector<int> output;
+	std::vector<PointData> output;
 	std::string del = " ";
 
 	std::vector<std::string> faceIndexGroups;
@@ -94,8 +90,19 @@ std::vector<int> Model::ParseFaces(std::string str)
 
 	for (int i = 0; i < faceIndexGroups.size(); i++)
 	{
+		PointData currentFaceIndexGroup;
+
 		int slashIndex = faceIndexGroups[i].find("/");
-		output.emplace_back(std::atoi(faceIndexGroups[i].substr(0, slashIndex).c_str())-1);
+		currentFaceIndexGroup.vertexIndex = std::atoi(faceIndexGroups[i].substr(0, slashIndex).c_str()) - 1;
+		faceIndexGroups[i].erase(0, slashIndex + 1);
+
+		slashIndex = faceIndexGroups[i].find("/");
+		currentFaceIndexGroup.textureCoordIndex = std::atoi(faceIndexGroups[i].substr(0, slashIndex).c_str()) - 1;
+		faceIndexGroups[i].erase(0, slashIndex + 1);
+
+		currentFaceIndexGroup.normalIndex = std::atoi(faceIndexGroups[i].c_str()) - 1;
+
+		output.emplace_back(currentFaceIndexGroup);
 		if (i > 2)
 		{
 			output.emplace_back(output[output.size() - 1 - (3 * i - 6)]);
@@ -112,6 +119,7 @@ std::vector<float3> Model::LoadObjFile(std::string fileName)
 	std::string storedFileContent;
 
 	std::vector<float3> allPoints;
+	std::vector <float2> allTexCoords;
 	std::vector<float3> trianglePoints;
 
 	if (!objFile.is_open() || fileName.substr(fileName.size()-4, 4) != ".obj")
@@ -129,14 +137,16 @@ std::vector<float3> Model::LoadObjFile(std::string fileName)
 		else if (storedFileContent.substr(0, 3) == "vt ")
 		{
 			float2 UV = ParseTextureCoords(storedFileContent);
-			textureCoords.emplace_back(UV);
+			allTexCoords.emplace_back(UV);
 		}
 		else if (storedFileContent.substr(0, 2) == "f ")
 		{
-			std::vector<int> faces = ParseFaces(storedFileContent);
+			std::vector<PointData> faces = ParseFaces(storedFileContent);
 			for (int i = 0; i < faces.size(); i++)
 			{
-				trianglePoints.emplace_back(allPoints[faces[i]]);
+				trianglePoints.emplace_back(allPoints[faces[i].vertexIndex]);
+				textureCoords.emplace_back(allTexCoords[faces[i].textureCoordIndex]);
+				//std::cout << faces[i].textureCoordIndex << " : " << i << "\n";
 			}
 		}
 	}
@@ -179,8 +189,21 @@ void Model::Render(RenderTarget* renderTarget, Camera* cam)
 
 				if (depth > renderTarget->GetDepth(x, y)) { continue; }
 
-				renderTarget->SetPixel(x, y, triColours[i / 3]);
-				renderTarget->SetDepth(x, y, depth);
+				if (!hasTexture)
+				{
+					renderTarget->SetPixel(x, y, triColours[i / 3]);
+					renderTarget->SetDepth(x, y, depth);
+				}
+				else
+				{
+					float2 textureCoord;
+					textureCoord += textureCoords[i + 0] * triWeights.x;
+					textureCoord += textureCoords[i + 1] * triWeights.y;
+					textureCoord += textureCoords[i + 2] * triWeights.z;
+
+					renderTarget->SetPixel(x, y, modelTexure->get_pixel(textureCoord.x, textureCoord.y));
+					renderTarget->SetDepth(x, y, depth);
+				}
 			}
 		}
 	}
