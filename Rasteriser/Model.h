@@ -26,7 +26,7 @@ public:
 
 	bool hasTexture;
 private:
-	float3 ParsePoints(std::string str);
+	float3 ParseVertexOrNormals(std::string str, bool isNormal = false);
 	float2 ParseTextureCoords(std::string str);
 	std::vector<PointData> ParseFaces(std::string str);
 	
@@ -34,6 +34,7 @@ private:
 
 	std::vector<float3> points;
 	std::vector<float2> textureCoords;
+	std::vector<float3> normals;
 	std::vector<Color> triColours;
 };
 

@@ -23,12 +23,13 @@ Model::Model(std::string fileName, std::string textureFileName)
 	hasTexture = true;
 }
 
-float3 Model::ParsePoints(std::string str)
+float3 Model::ParseVertexOrNormals(std::string str, bool isNormal)
 {
 	float3 output;
 	std::string del = " ";
 	int it = 0;
-	str.erase(0, 2);
+	if (isNormal) { str.erase(0, 3); }
+	else { str.erase(0, 2); }
 	auto pos = str.find(del);
 
 	while (pos != std::string::npos)
@@ -43,7 +44,7 @@ float3 Model::ParsePoints(std::string str)
 			break;
 		default:
 			std::cout << str << "\n" << it << "\n";
-			throw std::runtime_error("unexpected amount of data in vertex");
+			throw std::runtime_error("unexpected amount of data in normal");
 		}
 		str.erase(0, pos + del.length());
 		pos = str.find(del);
@@ -101,6 +102,7 @@ std::vector<PointData> Model::ParseFaces(std::string str)
 		faceIndexGroups[i].erase(0, slashIndex + 1);
 
 		currentFaceIndexGroup.normalIndex = std::atoi(faceIndexGroups[i].c_str()) - 1;
+		//std::cout << std::atoi(faceIndexGroups[i].c_str()) - 1 << std::endl;
 
 		output.emplace_back(currentFaceIndexGroup);
 		if (i > 2)
@@ -118,7 +120,8 @@ std::vector<float3> Model::LoadObjFile(std::string fileName)
 	std::ifstream objFile(fileName);
 	std::string storedFileContent;
 
-	std::vector<float3> allPoints;
+	std::vector<float3> allVertexes;
+	std::vector<float3> allNormals;
 	std::vector <float2> allTexCoords;
 	std::vector<float3> trianglePoints;
 
@@ -130,8 +133,8 @@ std::vector<float3> Model::LoadObjFile(std::string fileName)
 	{
 		if (storedFileContent.substr(0, 2) == "v ")
 		{
-			float3 point = ParsePoints(storedFileContent);
-			allPoints.emplace_back(point);
+			float3 vertex = ParseVertexOrNormals(storedFileContent); 
+			allVertexes.emplace_back(vertex); 
 			
 		}
 		else if (storedFileContent.substr(0, 3) == "vt ")
@@ -139,14 +142,19 @@ std::vector<float3> Model::LoadObjFile(std::string fileName)
 			float2 UV = ParseTextureCoords(storedFileContent);
 			allTexCoords.emplace_back(UV);
 		}
+		else if (storedFileContent.substr(0, 3) == "vn ")
+		{
+			float3 normal = ParseVertexOrNormals(storedFileContent, true);
+			allNormals.emplace_back(normal);
+		}
 		else if (storedFileContent.substr(0, 2) == "f ")
 		{
 			std::vector<PointData> faces = ParseFaces(storedFileContent);
 			for (int i = 0; i < faces.size(); i++)
 			{
-				trianglePoints.emplace_back(allPoints[faces[i].vertexIndex]);
+				trianglePoints.emplace_back(allVertexes[faces[i].vertexIndex]);
 				textureCoords.emplace_back(allTexCoords[faces[i].textureCoordIndex]);
-				//std::cout << faces[i].textureCoordIndex << " : " << i << "\n";
+				normals.emplace_back(allNormals[faces[i].normalIndex]);
 			}
 		}
 	}
