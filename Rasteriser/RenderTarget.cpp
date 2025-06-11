@@ -15,7 +15,7 @@ void RenderTarget::Clear()
 	{
 		for (int x = 0; x < width; x++)
 		{
-			SetPixel(x, y, Color(0, 0, 0, 255));
+			SetPixel(x, y, backgroundColor);
 			SetDepth(x, y, 1000);
 		}
 	}

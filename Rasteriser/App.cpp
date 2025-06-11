@@ -82,5 +82,9 @@ void App::HandleInput(float deltaTime)
 
 void App::Render()
 {
+	//auto startRender = std::chrono::high_resolution_clock::now();
 	cube->Render(renderer, &camera);
+	/*auto endRender = std::chrono::high_resolution_clock::now();
+	auto totalDuration = std::chrono::duration_cast<std::chrono::milliseconds>(endRender - startRender);
+	std::cout << "render time: " << totalDuration.count() << "ms" << std::endl;*/
 }

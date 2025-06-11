@@ -21,6 +21,7 @@ private:
 	uint32_t redMask = 0x00FF0000;
 	uint32_t greenMask = 0x0000FF00;
 	uint32_t blueMask = 0x000000FF;
+	Color backgroundColor = Color(0, 181, 226, 255);
 	float* depthBuffer;
 	int width;
 	int height;

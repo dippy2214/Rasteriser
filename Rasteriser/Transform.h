@@ -25,7 +25,7 @@ public:
 	BasisVectors GetBasisVectors()
 	{
 		BasisVectors out;
-		BasisVectors yaw;
+		/*BasisVectors yaw;
 		BasisVectors pitch;
 
 		yaw.ihat = float3(cosf(Yaw), 0, sinf(Yaw));
@@ -38,8 +38,16 @@ public:
 
 		out.ihat = TransformVector(yaw, pitch.ihat);
 		out.jhat = TransformVector(yaw, pitch.jhat);
-		out.khat = TransformVector(yaw, pitch.khat);
+		out.khat = TransformVector(yaw, pitch.khat);*/
 
+		float cosYaw = cosf(Yaw);
+		float sinYaw = sinf(Yaw);
+		float cosPitch = cosf(Pitch);
+		float sinPitch = sinf(Pitch);
+
+		out.ihat = float3(cosYaw, 0, sinYaw);
+		out.jhat = float3(sinPitch * sinYaw, cosPitch, -cosYaw * sinPitch);
+		out.khat = float3(-sinYaw * cosPitch, sinPitch, cosYaw * cosPitch);
 		
 		return out;
 	}
@@ -47,7 +55,8 @@ public:
 	BasisVectors GetInverseBasisVectors()
 	{
 		BasisVectors out;
-		BasisVectors yaw;
+
+		/*BasisVectors yaw;
 		BasisVectors pitch;
 
 		yaw.ihat = float3(cosf(-Yaw), 0, sinf(-Yaw));
@@ -60,7 +69,16 @@ public:
 
 		out.ihat = TransformVector(pitch, yaw.ihat);
 		out.jhat = TransformVector(pitch, yaw.jhat);
-		out.khat = TransformVector(pitch, yaw.khat);
+		out.khat = TransformVector(pitch, yaw.khat);*/
+
+		float cosYaw = cosf(Yaw);
+		float sinYaw = sinf(Yaw);
+		float cosPitch = cosf(Pitch);
+		float sinPitch = sinf(Pitch);
+
+		out.ihat = float3(cosYaw, sinPitch * sinYaw, -sinYaw * cosPitch);
+		out.jhat = float3(0, cosPitch, sinPitch);
+		out.khat = float3(sinYaw, -cosYaw * sinPitch, cosYaw * cosPitch);
 
 		return out;
 	}

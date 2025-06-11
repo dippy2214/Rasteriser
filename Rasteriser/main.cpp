@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <iostream>
 #include <fstream>
+#include <chrono>
+
 
 #include "App.h"
 #include "InputManager.h"
@@ -174,6 +176,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 	bool isRunning = true;
 	while (isRunning)
 	{
+		//auto start = std::chrono::high_resolution_clock::now();
 		inputManager.Update();
 		while (PeekMessage(&msg, hwnd, 0, 0, PM_REMOVE))
 		{
@@ -185,7 +188,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
 		deltaTime = static_cast<float>(currentTime.QuadPart - previousTime.QuadPart) / static_cast<float>(freq.QuadPart);
 		previousTime = currentTime;
+		//auto frameProcessStart = std::chrono::high_resolution_clock::now();
 		app.ProcessFrame(hwnd, deltaTime);
+		/*auto end = std::chrono::high_resolution_clock::now();
+		auto totalDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+		auto processingDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end - frameProcessStart);
+		std::cout << "total processing time: " << processingDuration.count() << "ms" << std::endl;
+		std::cout << "total time: " << totalDuration.count() << "ms" << std::endl;*/
+		std::cout << "pause here" << std::endl;
 	}
 	return 0;
 
