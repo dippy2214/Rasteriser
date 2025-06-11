@@ -6,6 +6,7 @@
 #include <fstream>
 #include <random>
 #include <chrono>
+#include <thread>
 
 Model::Model(std::string fileName)
 {
@@ -167,11 +168,13 @@ void Model::Render(RenderTarget* renderTarget, Camera* cam)
 {
 	for (int i = 0; i < points.size(); i += 3)
 	{
-		auto startTri = std::chrono::high_resolution_clock::now();
+		//auto startTri = std::chrono::high_resolution_clock::now();
 		float2 screenSize = renderTarget->Size();
 		float3 a = cam->VertexToScreen(points[i + 0], this, screenSize);
 		float3 b = cam->VertexToScreen(points[i + 1], this, screenSize);
 		float3 c = cam->VertexToScreen(points[i + 2], this, screenSize);
+
+		//std::cout << a.ToString() << " : " << b.ToString() << " : " << c.ToString() << std::endl;
 
 		if (a.z <= 0 || b.z <= 0 || c.z <= 0) { continue; }
 

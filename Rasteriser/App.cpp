@@ -28,7 +28,7 @@ void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBu
 	cube->position = float3(0, 0, 15);
 	renderer = new RenderTarget(width, height, frameBuffer);
 
-	camera.position = float3(0, 2, 0);
+	camera.position = float3(0, 0, 0);
 }
 
 void App::ProcessFrame(HWND viewPort, float dt)
@@ -57,26 +57,24 @@ void App::Update(float deltaTime)
 
 void App::HandleInput(float deltaTime)
 {
-	Transform::BasisVectors camVecs = camera.GetBasisVectors();
 	float3 camMoveDelta;
 
 	
 	if (inputManager->isLeftMouseDown())
 	{
 		float2 mouseDelta = inputManager->GetMouseDragDelta() / renderer->Size().x * mouseSens;
-		camera.Pitch += mouseDelta.y;
-		camera.Yaw -= mouseDelta.x;
+		camera.AddRotationX(mouseDelta.y);
+		camera.AddRotationY(-mouseDelta.x);
+		
 	}
 
-	if (inputManager->IsKeyPressed('W')) { camMoveDelta += camVecs.khat; }
-	if (inputManager->IsKeyPressed('S')) { camMoveDelta -= camVecs.khat; }
-	if (inputManager->IsKeyPressed('A')) { camMoveDelta += camVecs.ihat; }
-	if (inputManager->IsKeyPressed('D')) { camMoveDelta -= camVecs.ihat; }
-	if (inputManager->IsKeyPressed('E')) { camMoveDelta += camVecs.jhat; }
-	if (inputManager->IsKeyPressed('Q')) { camMoveDelta -= camVecs.jhat; }
+	if (inputManager->IsKeyPressed('W')) { camMoveDelta += camera.basisVectors.khat; }
+	if (inputManager->IsKeyPressed('S')) { camMoveDelta -= camera.basisVectors.khat; }
+	if (inputManager->IsKeyPressed('A')) { camMoveDelta += camera.basisVectors.ihat; }
+	if (inputManager->IsKeyPressed('D')) { camMoveDelta -= camera.basisVectors.ihat; }
+	if (inputManager->IsKeyPressed('E')) { camMoveDelta += camera.basisVectors.jhat; }
+	if (inputManager->IsKeyPressed('Q')) { camMoveDelta -= camera.basisVectors.jhat; }
 	
-
-
 	camera.position += camMoveDelta.Normalised() * camera.camSpeed * deltaTime;
 }
 
