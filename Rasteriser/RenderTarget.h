@@ -1,6 +1,8 @@
 #pragma once
 #include "FloatTypes.h"
 
+
+
 class RenderTarget
 {
 public:
@@ -9,8 +11,8 @@ public:
 	float2 Size() { return float2(width, height); }
 	void Clear();
 
-	void SetPixel(int x, int y, Color col);
-	Color GetPixel(int x, int y);
+	void SetPixel(int x, int y, float4 col);
+	float4 GetPixel(int x, int y);
 
 	void SetDepth(int x, int y, float depthVal);
 	float GetDepth(int x, int y);
@@ -21,7 +23,7 @@ private:
 	uint32_t redMask = 0x00FF0000;
 	uint32_t greenMask = 0x0000FF00;
 	uint32_t blueMask = 0x000000FF;
-	Color backgroundColor = Color(0, 181, 226, 255);
+	float4 backgroundColor = float4(0, 181, 226, 255);
 	float* depthBuffer;
 	int width;
 	int height;

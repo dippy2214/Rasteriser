@@ -1,50 +1,7 @@
 #pragma once
 #include <string>
 
-class Color
-{
-public:
-	Color() { r = 0; b = 0; g = 0; a = 255; }
-	Color(int r1, int g1, int b1, int a1) { r = r1; g = g1; b = b1; a = a1; }
-
-	Color operator*(Color const& x1)
-	{
-		Color result(r,g,b,a);
-		result.r *= x1.r;
-		result.g *= x1.g;
-		result.b *= x1.b;
-		result.a *= x1.a;
-		return result;
-	}
-	Color operator*(float const& x1)
-	{
-		Color result(r, g, b, a);
-		result.r *= x1;
-		result.g *= x1;
-		result.b *= x1;
-		result.a *= x1;
-		return result;
-	}
-	Color operator/(float const& x1)
-	{
-		Color result(r, g, b, a);
-		result.r /= x1;
-		result.g /= x1;
-		result.b /= x1;
-		result.a /= x1;
-		return result;
-	}
-
-	std::string ToString();
-
-	int32_t ToInt() { return a << 24 | r << 16 | g << 8 | b; }
-	int r = 0;
-	int g = 0;
-	int b = 0;
-	int a = 255;
-};
-
-
+#include "Color.h"
 
 class float2
 {
@@ -215,6 +172,7 @@ class float4
 public:
 	float4() {}
 	float4(float x1, float y1, float z1, float w1) { x = x1; y = y1; z = z1; w = w1; }
+	float4(Color col) { x = col.r / 255.0f; y = col.g / 255.0f; z = col.b / 255.0f; w = col.a / 255.0f; }
 
 	float4 operator+(float4 const& obj)
 	{
@@ -284,6 +242,15 @@ public:
 		return float4(f / f3.x, f / f3.y, f / f3.z, f / f3.w);
 	}
 	float4 operator*(Color const& col) { return float4(x * col.r, y * col.g, z * col.b, w * col.a); }
+	float4 operator*(float4 const& x1)
+	{
+		float4 result(x, y, z, w);
+		result.x *= x1.x;
+		result.y *= x1.y;
+		result.z *= x1.z;
+		result.w *= x1.w;
+		return result;
+	}
 
 	float2 xy() { return float2(x, y); }
 	std::string ToString()
@@ -298,7 +265,7 @@ public:
 		output += std::to_string(w);
 		return output;
 	}
-	Color ToColor() { return Color(x, y, z, w); }
+	Color ToColor() { return Color(x*255, y*255, z*255, w*255); }
 
 	float Dot(float4 b) { return (x * b.x) + (y * b.y) + (z * b.z) + (w * b.w); }
 	float4 Normalised() {
@@ -312,5 +279,7 @@ public:
 	float z = 0;
 	float w = 0;
 };
+
+
 
 

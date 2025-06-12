@@ -5,6 +5,8 @@
 #include <fstream>
 #include "FloatTypes.h"
 
+
+
 #pragma pack(push, 1)
 struct BMPFileHeader
 {
@@ -57,8 +59,8 @@ public:
     void read(const char* fname);
     void write(const char* fname);
 
-    void set_pixel(float x, float y, Color color);
-    Color get_pixel(float x, float y);
+    void set_pixel(float x, float y, float4 color);
+    float4 get_pixel(float x, float y);
     void clear_image();
 private:
 

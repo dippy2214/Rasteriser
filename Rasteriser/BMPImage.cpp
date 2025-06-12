@@ -200,24 +200,26 @@ void BMPImage::write(const char* fname)
     }
 }
 
-void BMPImage::set_pixel(float x, float y, Color color)
+void BMPImage::set_pixel(float x, float y, float4 color)
 {
-    
+    Color col((color * 255).ToColor());
     if ((x < info_header.width && x >= 0) && (y < info_header.height && y >= 0))
     {
         int channels = info_header.bit_count / 8;
-        data[channels * (y * info_header.width + x) + 0] = color.b;
-        data[channels * (y * info_header.width + x) + 1] = color.g;
-        data[channels * (y * info_header.width + x) + 2] = color.r;
+        data[channels * (y * info_header.width + x) + 0] = col.b;
+        data[channels * (y * info_header.width + x) + 1] = col.g;
+        data[channels * (y * info_header.width + x) + 2] = col.r;
         if (channels == 4)
         {
-            data[channels * (y * info_header.width + x) + 3] = color.a;
+            data[channels * (y * info_header.width + x) + 3] = col.a;
         }
     }
+    std::cout << col.ToString() << "\n";
 }
 
-Color BMPImage::get_pixel(float x, float y)
+float4 BMPImage::get_pixel(float x, float y)
 {
+    
     int channels = info_header.bit_count / 8;
     int texX = Maths::Clamp(info_header.width * x, 0, info_header.width);
     int texY = Maths::Clamp(info_header.height * y, 0, info_header.height);
@@ -231,6 +233,8 @@ Color BMPImage::get_pixel(float x, float y)
     {
         output.a = data[channels * (texY * info_header.width + texX) + 3];
     }
+
+    float4 out(output);
 
     return output;
 }

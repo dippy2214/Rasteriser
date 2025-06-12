@@ -215,7 +215,7 @@ void Model::Render(RenderTarget* renderTarget, Camera* cam)
 					textureCoord += textureCoords[i + 2] / depths.z * triWeights.z;
 					textureCoord *= depth;
 
-					Color textureColor = modelTexure->get_pixel(textureCoord.x, textureCoord.y);
+					float4 textureColor = modelTexure->get_pixel(textureCoord.x, textureCoord.y);
 					float lightIntensity = std::max(0.0f, normals[i].Dot(float3(0, 1, 1)));
 					float4 lightingColor = float4(1, 1, 1, 1) * lightIntensity;
 
@@ -223,7 +223,7 @@ void Model::Render(RenderTarget* renderTarget, Camera* cam)
 
 					float4 finalColor = lightingColor * textureColor;
 					
-					renderTarget->SetPixel(x, y, finalColor.ToColor());
+					renderTarget->SetPixel(x, y, finalColor);
 					renderTarget->SetDepth(x, y, depth);
 				}
 			}

@@ -195,7 +195,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 		auto processingDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end - frameProcessStart);
 		std::cout << "total processing time: " << processingDuration.count() << "ms" << std::endl;
 		std::cout << "total time: " << totalDuration.count() << "ms" << std::endl;*/
-		std::cout << "pause here" << std::endl;
+		//std::cout << "pause here" << std::endl;
 	}
 	return 0;
 
