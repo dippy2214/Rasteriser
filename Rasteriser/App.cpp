@@ -11,6 +11,9 @@
 #include "Maths.h"
 #include "App.h"
 #include "Transform.h"
+#include "Shaders/ShaderProgram.h"
+#include "Shaders/VertexShader.h"
+#include "Shaders/PixelShader.h"
 
 
 App::App(int w, int h, InputManager* inputManager, uint32_t* frameBuffer)
@@ -29,6 +32,8 @@ void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBu
 	renderer = new RenderTarget(width, height, frameBuffer);
 
 	camera.position = float3(0, 0, 0);
+
+	basicShader = new ShaderProgram(new VertexShader(), new PixelShader());
 }
 
 void App::ProcessFrame(HWND viewPort, float dt)
@@ -81,7 +86,7 @@ void App::HandleInput(float deltaTime)
 void App::Render()
 {
 	//auto startRender = std::chrono::high_resolution_clock::now();
-	cube->Render(renderer, &camera);
+	basicShader->RenderObject(cube->GetShaderDetails(), renderer);
 	/*auto endRender = std::chrono::high_resolution_clock::now();
 	auto totalDuration = std::chrono::duration_cast<std::chrono::milliseconds>(endRender - startRender);
 	std::cout << "render time: " << totalDuration.count() << "ms" << std::endl;*/

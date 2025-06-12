@@ -14,24 +14,35 @@ struct PointData
 	int textureCoordIndex;
 	int normalIndex;
 };
+
+struct ShaderDetails
+{
+public:
+	float3 vertex;
+	float2 textureCoord;
+	float3 normal;
+};
+
 class Model : public Transform
 {
-	
-public: 
-	
+public: 	
 	Model(std::string fileName);
 	Model(std::string fileName, std::string textureFileName);
 	std::vector<float3> LoadObjFile(std::string fileName);
 	void Render(RenderTarget* renderTarget, Camera* cam);
+	std::pair<int, ShaderDetails*> GetShaderDetails();
 
 	bool hasTexture;
+
 private:
 	float3 ParseVertexOrNormals(std::string str, bool isNormal = false);
 	float2 ParseTextureCoords(std::string str);
 	std::vector<PointData> ParseFaces(std::string str);
 	
+	
 	BMPImage* modelTexure;
 
+public:
 	std::vector<float3> points;
 	std::vector<float2> textureCoords;
 	std::vector<float3> normals;

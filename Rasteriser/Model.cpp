@@ -117,6 +117,21 @@ std::vector<PointData> Model::ParseFaces(std::string str)
 	return output;
 }
 
+std::pair<int, ShaderDetails*> Model::GetShaderDetails()
+{
+	std::vector<ShaderDetails> shaderDetails;
+	for (int i = 0; i < points.size(); i++)
+	{
+		ShaderDetails currentPoint;
+		currentPoint.vertex = points[i];
+		currentPoint.textureCoord = textureCoords[i];
+		currentPoint.normal = normals[i];
+		shaderDetails.emplace_back(currentPoint);
+	}
+	std::pair<int, ShaderDetails*> output = { points.size(), &shaderDetails[0] };
+	return output;
+}
+
 std::vector<float3> Model::LoadObjFile(std::string fileName)
 {
 	std::ifstream objFile(fileName);
