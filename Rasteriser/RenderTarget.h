@@ -12,6 +12,7 @@ public:
 	void Clear();
 
 	void SetPixel(int x, int y, float4 col);
+	void SetPixel(float2 pos, float4 col) { SetPixel(pos.x, pos.y, col); }
 	float4 GetPixel(int x, int y);
 
 	void SetDepth(int x, int y, float depthVal);

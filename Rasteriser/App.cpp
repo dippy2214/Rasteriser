@@ -30,8 +30,8 @@ void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBu
 	cube = new Model("Models/evilmonkey.obj", "Textures/evilmonkeytexture.bmp");
 	cube->position = float3(0, 0, 15);
 	renderer = new RenderTarget(width, height, frameBuffer);
-
-	camera.position = float3(0, 0, 0);
+	camera = new Camera();
+	//camera.position = float3(0, 0, 0);
 
 	basicShader = new ShaderProgram(new VertexShader(), new PixelShader());
 }
@@ -68,25 +68,25 @@ void App::HandleInput(float deltaTime)
 	if (inputManager->isLeftMouseDown())
 	{
 		float2 mouseDelta = inputManager->GetMouseDragDelta() / renderer->Size().x * mouseSens;
-		camera.AddRotationX(mouseDelta.y);
-		camera.AddRotationY(-mouseDelta.x);
+		camera->AddRotationX(mouseDelta.y);
+		camera->AddRotationY(-mouseDelta.x);
 		
 	}
 
-	if (inputManager->IsKeyPressed('W')) { camMoveDelta += camera.basisVectors.khat; }
-	if (inputManager->IsKeyPressed('S')) { camMoveDelta -= camera.basisVectors.khat; }
-	if (inputManager->IsKeyPressed('A')) { camMoveDelta += camera.basisVectors.ihat; }
-	if (inputManager->IsKeyPressed('D')) { camMoveDelta -= camera.basisVectors.ihat; }
-	if (inputManager->IsKeyPressed('E')) { camMoveDelta += camera.basisVectors.jhat; }
-	if (inputManager->IsKeyPressed('Q')) { camMoveDelta -= camera.basisVectors.jhat; }
+	if (inputManager->IsKeyPressed('W')) { camMoveDelta += camera->basisVectors.khat; }
+	if (inputManager->IsKeyPressed('S')) { camMoveDelta -= camera->basisVectors.khat; }
+	if (inputManager->IsKeyPressed('A')) { camMoveDelta += camera->basisVectors.ihat; }
+	if (inputManager->IsKeyPressed('D')) { camMoveDelta -= camera->basisVectors.ihat; }
+	if (inputManager->IsKeyPressed('E')) { camMoveDelta += camera->basisVectors.jhat; }
+	if (inputManager->IsKeyPressed('Q')) { camMoveDelta -= camera->basisVectors.jhat; }
 	
-	camera.position += camMoveDelta.Normalised() * camera.camSpeed * deltaTime;
+	camera->position += camMoveDelta.Normalised() * camera->camSpeed * deltaTime;
 }
 
 void App::Render()
 {
 	//auto startRender = std::chrono::high_resolution_clock::now();
-	basicShader->RenderObject(cube->GetShaderDetails(), renderer);
+	basicShader->RenderObject(cube->GetShaderDetails(), cube, camera, renderer, cube->GetTexture());
 	/*auto endRender = std::chrono::high_resolution_clock::now();
 	auto totalDuration = std::chrono::duration_cast<std::chrono::milliseconds>(endRender - startRender);
 	std::cout << "render time: " << totalDuration.count() << "ms" << std::endl;*/
