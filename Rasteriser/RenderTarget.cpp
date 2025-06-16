@@ -9,6 +9,11 @@ RenderTarget::RenderTarget(int w, int h, uint32_t* renderTarget)
 	depthBuffer = new float[width * height];
 }
 
+RenderTarget::~RenderTarget()
+{
+	delete depthBuffer;
+}
+
 void RenderTarget::Clear()
 {
 	for (int y = 0; y < height; y++)

@@ -15,6 +15,32 @@ BITMAPINFO bitmap;
 void* pixels = nullptr;
 InputManager inputManager;
 
+struct DebugMemoryData
+{
+	uint32_t allocations;
+	uint32_t deallocations;
+
+};
+
+static DebugMemoryData debugMemoryData;
+
+void* operator new(size_t size)
+{
+	debugMemoryData.allocations += size;
+	return std::malloc(size);
+}
+
+void operator delete(void* address, size_t size)
+{
+	debugMemoryData.deallocations += size;
+	free(address);
+}
+
+void OutputMemoryData()
+{
+	std::cout << "Allocated: " << debugMemoryData.allocations << "\nDeallocated: " << debugMemoryData.deallocations << "\nMemory Usage: " << debugMemoryData.allocations - debugMemoryData.deallocations << "\n";
+}
+
 void OpenConsole() {
 	if (AllocConsole()) {
 		// Redirect std::cout to the console
@@ -190,12 +216,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 		previousTime = currentTime;
 		//auto frameProcessStart = std::chrono::high_resolution_clock::now();
 		app.ProcessFrame(hwnd, deltaTime);
+		OutputMemoryData();
 		/*auto end = std::chrono::high_resolution_clock::now();
 		auto totalDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 		auto processingDuration = std::chrono::duration_cast<std::chrono::milliseconds>(end - frameProcessStart);
 		std::cout << "total processing time: " << processingDuration.count() << "ms" << std::endl;
 		std::cout << "total time: " << totalDuration.count() << "ms" << std::endl;*/
-		//std::cout << "pause here" << std::endl;
+		std::cout << "pause here" << std::endl;
 	}
 	return 0;
 

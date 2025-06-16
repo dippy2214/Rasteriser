@@ -3,6 +3,7 @@
 
 #include "ColorType.h"
 
+#pragma pack(push, 1)
 class float2
 {
 public:
@@ -279,7 +280,7 @@ public:
 	float z = 0;
 	float w = 0;
 };
-
+#pragma pack(pop)
 
 
 

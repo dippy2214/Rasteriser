@@ -9,12 +9,15 @@
 #include "Camera.h"
 #include "InputManager.h"
 #include "Shaders/ShaderProgram.h"
+#include "Shaders/VertexShader.h"
+#include "Shaders/PixelShader.h"
 
 class App
 {
 	//windows application stuff
 public:
 	App(int w, int h, InputManager* inputs, uint32_t* frameBuffer);
+	~App();
 	void InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* pixelBuffer);
 	void ProcessFrame(HWND viewPort, float dt);
 	void UpdateViewport(HWND viewPort);
@@ -35,6 +38,8 @@ private:
 	Camera* camera;
 	Model* cube;
 	RenderTarget* renderer;
+	VertexShader* vertexShader;
+	PixelShader* pixelShader;
 	ShaderProgram* basicShader;
 };
 

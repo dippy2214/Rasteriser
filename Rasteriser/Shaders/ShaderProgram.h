@@ -9,6 +9,7 @@ class ShaderProgram : public BaseShaderProgram
 {
 public:
 	ShaderProgram(VertexShader* VS, PixelShader* PS);
+	~ShaderProgram();
 	void RenderObject(std::pair<int, ShaderDetails*> shaderDetails, Transform* transform, Camera* cam, RenderTarget* renderTarget, BMPImage* tex);
 
 	VertexShader* vertexShader;

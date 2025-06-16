@@ -8,6 +8,7 @@
 
 class Rasteriser : public BaseShader
 {
+	#pragma pack(push, 1)
 	struct InputParams
 	{
 		float3 vertex;
@@ -25,13 +26,14 @@ class Rasteriser : public BaseShader
 	struct RasteriserOutput
 	{
 		int count;
-		OutputParams* outputs;
+		OutputParams* outputs = nullptr;
 	};
+	#pragma pack(pop)
 public:
+	~Rasteriser();
 	void* RunShader(void* shaderParameters, int dataSize) override;
 	void SetShaderParameters(RenderTarget* renderer, Camera* camera);
-	std::vector<OutputParams> outputs;
-	RasteriserOutput finalOut;
+	//RasteriserOutput finalOut;
 	RenderTarget* renderTarget;
 	Camera* cam;
 };

@@ -25,6 +25,14 @@ Model::Model(std::string fileName, std::string textureFileName)
 	hasTexture = true;
 }
 
+Model::~Model()
+{
+	if (hasTexture)
+	{
+		delete modelTexture;
+	}
+}
+
 float3 Model::ParseVertexOrNormals(std::string str, bool isNormal)
 {
 	float3 output;
@@ -119,6 +127,8 @@ std::vector<PointData> Model::ParseFaces(std::string str)
 
 std::pair<int, ShaderDetails*> Model::GetShaderDetails()
 {
+	shaderDetails.clear();
+	shaderDetails.reserve(points.size());
 	for (int i = 0; i < points.size(); i++)
 	{
 		ShaderDetails currentPoint;
