@@ -26,12 +26,12 @@ class Rasteriser : public BaseShader
 	struct RasteriserOutput
 	{
 		int count;
-		std::vector<OutputParams> outputs;
+		OutputParams* outputs = nullptr;
 	};
 	#pragma pack(pop)
 public:
 	~Rasteriser();
-	char* RunShader(void* shaderParameters, int dataSize) override;
+	void* RunShader(void* shaderParameters, int dataSize) override;
 	void SetShaderParameters(RenderTarget* renderer, Camera* camera);
 	//RasteriserOutput finalOut;
 	RenderTarget* renderTarget;

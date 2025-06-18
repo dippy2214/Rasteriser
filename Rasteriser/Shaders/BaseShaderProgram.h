@@ -31,7 +31,7 @@ class BaseShaderProgram
 	#pragma pack(pop)
 public:
 	void Render(void* inputParams, int inputSize);
-	void ThreadWorker(int start, int end, std::vector<ShaderOutputs>* outputs, ShaderDetails* input); 
+	void ThreadWorker(int start, int end, std::vector<ShaderOutputs*>* outputs, ShaderDetails* input); 
 	void SetShaderParameters(BaseShader* vertex, BaseShader* pixel, RenderTarget* renderTarget, Camera* camera);
 private:
 	RenderTarget* renderer;

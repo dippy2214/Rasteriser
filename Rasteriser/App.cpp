@@ -94,9 +94,7 @@ void App::HandleInput(float deltaTime)
 void App::Render()
 {
 	//auto startRender = std::chrono::high_resolution_clock::now();
-	//std::pair<int, ShaderDetails*> shaderDetails = cube->GetShaderDetails();
 	basicShader->RenderObject(cube->GetShaderDetails(), cube, camera, renderer, cube->GetTexture());
-	//delete[] shaderDetails;
 	/*auto endRender = std::chrono::high_resolution_clock::now();
 	auto totalDuration = std::chrono::duration_cast<std::chrono::milliseconds>(endRender - startRender);
 	std::cout << "render time: " << totalDuration.count() << "ms" << std::endl;*/

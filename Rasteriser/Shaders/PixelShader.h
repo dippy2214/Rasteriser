@@ -22,7 +22,7 @@ class PixelShader : public BaseShader
 	BMPImage* modelTexture;
 public:
 	~PixelShader();
-	char* RunShader(void* shaderParameters, int dataSize) override;
+	void* RunShader(void* shaderParameters, int dataSize) override;
 	void SetShaderParameters(BMPImage* texture);
 
 };
