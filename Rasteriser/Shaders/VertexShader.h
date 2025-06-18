@@ -28,7 +28,7 @@ class VertexShader : public BaseShader
 	//InputParams output;
 public:
 	~VertexShader();
-	void* RunShader(void* shaderParameters, int dataSize) override;
+	char* RunShader(void* shaderParameters, int dataSize) override;
 	void SetShaderParameters(Camera* camera, Transform* trans, RenderTarget* renderer);
 };
 

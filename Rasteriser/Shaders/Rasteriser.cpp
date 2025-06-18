@@ -6,10 +6,11 @@ Rasteriser::~Rasteriser()
 {
 }
 
-void* Rasteriser::RunShader(void* shaderParameters, int dataSize)
+char* Rasteriser::RunShader(void* shaderParameters, int dataSize)
 {
 	InputParams* inputs = (InputParams*)shaderParameters;
-	std::vector<OutputParams> outputs;
+	RasteriserOutput outStruct;
+	// std::vector<OutputParams> outputData;
 	//auto startTri = std::chrono::high_resolution_clock::now();
 	float2 screenSize = renderTarget->Size();
 	float3 a = inputs[0].vertex;
@@ -44,27 +45,26 @@ void* Rasteriser::RunShader(void* shaderParameters, int dataSize)
 
 			if (depth > renderTarget->GetDepth(x, y)) { continue; }
 			
-			OutputParams outputData;
-			outputData.screenCoords = float2(x, y);
+			OutputParams outputParams;
+			outputParams.screenCoords = float2(x, y);
 
 			float2 textureCoord;
 			textureCoord += inputs[0].textureCoords / depths.x * triWeights.x;
 			textureCoord += inputs[1].textureCoords / depths.y * triWeights.y;
 			textureCoord += inputs[2].textureCoords / depths.z * triWeights.z;
 			textureCoord *= depth;
-			outputData.textureCoords = textureCoord;
-			outputData.normals = inputs[0].normals;
+			outputParams.textureCoords = textureCoord;
+			outputParams.normals = inputs[0].normals;
 			//outputData.depth = depth;
 
-			outputs.emplace_back(outputData);
+			outStruct.outputs.emplace_back(outputParams);
 		}
 	}
-	if (outputs.size() == 0)
+	if (outStruct.outputs.size() == 0)
 	{
 		return nullptr;
 	}
 	return nullptr;
-	RasteriserOutput* finalOut = new RasteriserOutput;
 	//finalOut->count = outputs.size();
 	//finalOut->outputs = new OutputParams[outputs.size()];
 	
@@ -74,6 +74,9 @@ void* Rasteriser::RunShader(void* shaderParameters, int dataSize)
 	}*/
 	//finalOut->outputs = &outputs[0];
 	
+	char* finalOut = new char[sizeof(outStruct) + outStruct.outputs.size() * sizeof(OutputParams)];
+	memcpy(finalOut, &outStruct, sizeof(outStruct));
+
 	return finalOut;
 }
 

@@ -16,6 +16,7 @@ void ShaderProgram::RenderObject(std::pair<int, ShaderDetails*> shaderDetails, T
 	vertexShader->SetShaderParameters(cam, transform, renderTarget);
 	pixelShader->SetShaderParameters(tex);
 
-	int i = shaderDetails.first;
+	//int i = shaderDetails.first;
 	Render(shaderDetails.second, shaderDetails.first);
+	//delete[] shaderDetails.second;
 }

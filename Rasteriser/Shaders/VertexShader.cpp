@@ -5,15 +5,19 @@ VertexShader::~VertexShader()
 {
 }
 
-void* VertexShader::RunShader(void* shaderParameters, int dataSize)
+char* VertexShader::RunShader(void* shaderParameters, int dataSize)
 {
 	InputParams inputs = *(InputParams*)shaderParameters;
-	OutputParams* output = new OutputParams;
+	OutputParams output;
 	float2 screenSize = renderTarget->Size();
-	output->vertex = cam->VertexToScreen(inputs.vertex, transform, screenSize);
-	output->normals = inputs.normals;
-	output->textureCoords = inputs.textureCoords;
-	return output;
+	output.vertex = cam->VertexToScreen(inputs.vertex, transform, screenSize);
+	output.normals = inputs.normals;
+	output.textureCoords = inputs.textureCoords;
+
+	char* outBuf = new char[sizeof(OutputParams)];
+	memcpy(outBuf, &output, sizeof(OutputParams));
+
+	return outBuf;
 }
 
 void VertexShader::SetShaderParameters(Camera* camera, Transform* trans, RenderTarget* renderer)
