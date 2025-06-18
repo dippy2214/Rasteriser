@@ -137,30 +137,18 @@
     <ClCompile Include="Maths.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="RenderTarget.cpp" />
-    <ClCompile Include="Shaders\BaseShader.cpp" />
-    <ClCompile Include="Shaders\BaseShaderProgram.cpp" />
-    <ClCompile Include="Shaders\PixelShader.cpp" />
-    <ClCompile Include="Shaders\Rasteriser.cpp" />
-    <ClCompile Include="Shaders\ShaderProgram.cpp" />
-    <ClCompile Include="Shaders\VertexShader.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="BMPImage.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="ColorType.h" />
+    <ClInclude Include="Color.h" />
     <ClInclude Include="FloatTypes.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="RenderTarget.h" />
-    <ClInclude Include="Shaders\BaseShader.h" />
-    <ClInclude Include="Shaders\BaseShaderProgram.h" />
-    <ClInclude Include="Shaders\PixelShader.h" />
-    <ClInclude Include="Shaders\Rasteriser.h" />
-    <ClInclude Include="Shaders\ShaderProgram.h" />
-    <ClInclude Include="Shaders\VertexShader.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

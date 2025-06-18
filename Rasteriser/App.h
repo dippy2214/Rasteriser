@@ -8,7 +8,6 @@
 #include "Maths.h"
 #include "Camera.h"
 #include "InputManager.h"
-#include "Shaders/ShaderProgram.h"
 
 class App
 {
@@ -35,7 +34,5 @@ private:
 	Camera camera;
 	Model* cube;
 	RenderTarget* renderer;
-
-	ShaderProgram* basicShader;
 };
 

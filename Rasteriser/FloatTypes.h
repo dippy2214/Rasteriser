@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "ColorType.h"
+#include "Color.h"
 
 class float2
 {
