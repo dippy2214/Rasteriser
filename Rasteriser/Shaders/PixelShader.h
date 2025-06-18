@@ -5,7 +5,6 @@
 
 class PixelShader : public BaseShader
 {
-	#pragma pack(push, 1)
 	struct InputParams
 	{
 		float2 screenCoords;
@@ -18,10 +17,10 @@ class PixelShader : public BaseShader
 		float2 pixelPosition;
 		float4 pixelColor;
 	};
-	#pragma pack(pop)
+	OutputParams outputs;
+
 	BMPImage* modelTexture;
 public:
-	~PixelShader();
 	void* RunShader(void* shaderParameters, int dataSize) override;
 	void SetShaderParameters(BMPImage* texture);
 

@@ -2,14 +2,9 @@
 #include "../Maths.h"
 #include <iostream>
 
-Rasteriser::~Rasteriser()
-{
-}
-
 void* Rasteriser::RunShader(void* shaderParameters, int dataSize)
 {
 	InputParams* inputs = (InputParams*)shaderParameters;
-	std::vector<OutputParams> outputs;
 	//auto startTri = std::chrono::high_resolution_clock::now();
 	float2 screenSize = renderTarget->Size();
 	float3 a = inputs[0].vertex;
@@ -59,22 +54,13 @@ void* Rasteriser::RunShader(void* shaderParameters, int dataSize)
 			outputs.emplace_back(outputData);
 		}
 	}
+	finalOut.count = outputs.size();
 	if (outputs.size() == 0)
 	{
 		return nullptr;
 	}
-	return nullptr;
-	RasteriserOutput* finalOut = new RasteriserOutput;
-	//finalOut->count = outputs.size();
-	//finalOut->outputs = new OutputParams[outputs.size()];
-	
-	/*for (int i = 0; i < outputs.size(); i++)
-	{
-		finalOut->outputs[i] = outputs[i];
-	}*/
-	//finalOut->outputs = &outputs[0];
-	
-	return finalOut;
+	finalOut.outputs = &outputs[0];
+	return &finalOut;
 }
 
 void Rasteriser::SetShaderParameters(RenderTarget* renderer, Camera* camera)

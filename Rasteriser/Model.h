@@ -14,7 +14,7 @@ struct PointData
 	int textureCoordIndex;
 	int normalIndex;
 };
-#pragma pack(push, 1)
+
 struct ShaderDetails
 {
 public:
@@ -22,13 +22,12 @@ public:
 	float2 textureCoord;
 	float3 normal;
 };
-#pragma pack(pop)
+
 class Model : public Transform
 {
 public: 	
 	Model(std::string fileName);
 	Model(std::string fileName, std::string textureFileName);
-	~Model();
 	std::vector<float3> LoadObjFile(std::string fileName);
 	void Render(RenderTarget* renderTarget, Camera* cam);
 	std::pair<int, ShaderDetails*> GetShaderDetails();

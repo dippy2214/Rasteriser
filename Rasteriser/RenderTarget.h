@@ -7,7 +7,6 @@ class RenderTarget
 {
 public:
 	RenderTarget(int w, int h, uint32_t* pixelBuffer);
-	~RenderTarget();
 	
 	float2 Size() { return float2(width, height); }
 	void Clear();

@@ -11,21 +11,14 @@
 #include "Maths.h"
 #include "App.h"
 #include "Transform.h"
+#include "Shaders/ShaderProgram.h"
+#include "Shaders/VertexShader.h"
+#include "Shaders/PixelShader.h"
 
 
 App::App(int w, int h, InputManager* inputManager, uint32_t* frameBuffer)
 {
 	InitApp(w, h, inputManager, frameBuffer);
-}
-
-App::~App()
-{
-	delete cube;
-	delete renderer;
-	delete camera;
-	delete basicShader;
-	delete vertexShader;
-	delete pixelShader;
 }
 
 void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBuffer)
@@ -39,9 +32,8 @@ void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBu
 	renderer = new RenderTarget(width, height, frameBuffer);
 	camera = new Camera();
 	//camera.position = float3(0, 0, 0);
-	vertexShader = new VertexShader();
-	pixelShader = new PixelShader();
-	basicShader = new ShaderProgram(vertexShader, pixelShader);
+
+	basicShader = new ShaderProgram(new VertexShader(), new PixelShader());
 }
 
 void App::ProcessFrame(HWND viewPort, float dt)
