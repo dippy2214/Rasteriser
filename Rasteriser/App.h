@@ -32,9 +32,10 @@ public:
 
 private:
 	InputManager* inputManager;
-	Camera* camera;
+	Camera camera;
 	Model* cube;
 	RenderTarget* renderer;
+
 	ShaderProgram* basicShader;
 };
 

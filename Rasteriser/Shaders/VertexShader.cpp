@@ -1,20 +1,17 @@
 #include "VertexShader.h"
-#include <iostream>
 
 void* VertexShader::RunShader(void* shaderParameters, int dataSize)
 {
-	InputParams inputs = *(InputParams*)shaderParameters;
-	float2 screenSize = renderTarget->Size();
-	output.vertex = cam->VertexToScreen(inputs.vertex, transform, screenSize);
-	output.normals = inputs.normals;
-	output.textureCoords = inputs.textureCoords;
-	return &output;
+	InputParams* inputs = (InputParams*)shaderParameters;
+	return inputs;
 }
 
-void VertexShader::SetShaderParameters(Camera* camera, Transform* trans, RenderTarget* renderer)
-{
-	cam = camera;
-	transform = trans;
-	renderTarget = renderer;
-}
-
+//void VertexShader::SetShaderParameters(float3* vertexes, float2* textureCoords, float3* normals)
+//{
+//	
+//	//inputParams.vertexArray = vertexes;
+//	inputParams.texCoordArray = textureCoords;
+//	inputParams.normalArray = normals;
+//
+//	
+//}

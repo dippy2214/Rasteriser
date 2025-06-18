@@ -21,7 +21,7 @@ Model::Model(std::string fileName)
 Model::Model(std::string fileName, std::string textureFileName)
 {
 	points = LoadObjFile(fileName);
-	modelTexture = new BMPImage(textureFileName.c_str());
+	modelTexure = new BMPImage(textureFileName.c_str());
 	hasTexture = true;
 }
 
@@ -119,6 +119,7 @@ std::vector<PointData> Model::ParseFaces(std::string str)
 
 std::pair<int, ShaderDetails*> Model::GetShaderDetails()
 {
+	std::vector<ShaderDetails> shaderDetails;
 	for (int i = 0; i < points.size(); i++)
 	{
 		ShaderDetails currentPoint;
@@ -129,11 +130,6 @@ std::pair<int, ShaderDetails*> Model::GetShaderDetails()
 	}
 	std::pair<int, ShaderDetails*> output = { points.size(), &shaderDetails[0] };
 	return output;
-}
-
-BMPImage* Model::GetTexture()
-{
-	return modelTexture;
 }
 
 std::vector<float3> Model::LoadObjFile(std::string fileName)
@@ -234,7 +230,7 @@ void Model::Render(RenderTarget* renderTarget, Camera* cam)
 					textureCoord += textureCoords[i + 2] / depths.z * triWeights.z;
 					textureCoord *= depth;
 
-					float4 textureColor = modelTexture->get_pixel(textureCoord.x, textureCoord.y);
+					float4 textureColor = modelTexure->get_pixel(textureCoord.x, textureCoord.y);
 					float lightIntensity = std::max(0.0f, normals[i].Dot(float3(0, 1, 1)));
 					float4 lightingColor = float4(1, 1, 1, 1) * lightIntensity;
 

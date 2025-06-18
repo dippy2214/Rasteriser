@@ -31,7 +31,6 @@ public:
 	std::vector<float3> LoadObjFile(std::string fileName);
 	void Render(RenderTarget* renderTarget, Camera* cam);
 	std::pair<int, ShaderDetails*> GetShaderDetails();
-	BMPImage* GetTexture();
 
 	bool hasTexture;
 
@@ -41,8 +40,7 @@ private:
 	std::vector<PointData> ParseFaces(std::string str);
 	
 	
-	BMPImage* modelTexture;
-	std::vector<ShaderDetails> shaderDetails;
+	BMPImage* modelTexure;
 
 public:
 	std::vector<float3> points;

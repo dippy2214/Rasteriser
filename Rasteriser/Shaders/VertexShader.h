@@ -1,8 +1,6 @@
 #pragma once
 #include "BaseShader.h"
 #include "../FloatTypes.h"
-#include "../Camera.h"
-#include "../RenderTarget.h"
 
 class VertexShader : public BaseShader
 {
@@ -12,13 +10,10 @@ class VertexShader : public BaseShader
 		float2 textureCoords;
 		float3 normals;
 	};
-	Camera* cam;
-	Transform* transform;
-	RenderTarget* renderTarget;
-
-	InputParams output;
 public:
 	void* RunShader(void* shaderParameters, int dataSize) override;
-	void SetShaderParameters(Camera* camera, Transform* trans, RenderTarget* renderer);
+	//void SetShaderParameters(float3* vertexes, float2* textureCoords, float3* normals);
+
+	//InputParams inputParams;
 };
 
