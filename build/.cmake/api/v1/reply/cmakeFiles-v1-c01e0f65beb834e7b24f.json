@@ -1,0 +1,133 @@
+{
+	"globsDependent" : 
+	[
+		{
+			"expression" : "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/*.cpp",
+			"paths" : 
+			[
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Audio/AudioEngine.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/App.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/FloatTypes.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/InputManager.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/Maths.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/Transform.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/main.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Graphics/BMPImage.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Graphics/Camera.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Graphics/Color.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Graphics/Model.cpp",
+				"C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Graphics/RenderTarget.cpp"
+			],
+			"recurse" : true
+		}
+	],
+	"inputs" : 
+	[
+		{
+			"path" : "CMakeLists.txt"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.30.3/CMakeSystem.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInitialize.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/Platform/Windows-Initialize.cmake"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.30.3/CMakeCXXCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeSystemSpecificInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeGenericSystem.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeInitializeConfigs.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/Platform/Windows.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/Platform/WindowsPaths.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeCXXInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeLanguageInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/Compiler/MSVC-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/Compiler/MSVC.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/Compiler/CMakeCommonCompilerMacros.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/Platform/Windows-MSVC-CXX.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/Platform/Windows-MSVC.cmake"
+		},
+		{
+			"isGenerated" : true,
+			"path" : "build/CMakeFiles/3.30.3/CMakeRCCompiler.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeRCInformation.cmake"
+		},
+		{
+			"isCMake" : true,
+			"isExternal" : true,
+			"path" : "C:/Program Files/CMake/share/cmake-3.30/Modules/CMakeCommonLanguageInclude.cmake"
+		}
+	],
+	"kind" : "cmakeFiles",
+	"paths" : 
+	{
+		"build" : "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build",
+		"source" : "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser"
+	},
+	"version" : 
+	{
+		"major" : 1,
+		"minor" : 1
+	}
+}

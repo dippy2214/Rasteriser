@@ -1,0 +1,32 @@
+#pragma once
+#include "../Core/FloatTypes.h"
+#include <atomic>
+
+
+
+class RenderTarget
+{
+public:
+	RenderTarget(int w, int h, uint32_t* pixelBuffer);
+	
+	float2 Size() { return float2(width, height); }
+	void Clear();
+
+	void SetPixel(int x, int y, float4 col);
+	float4 GetPixel(int x, int y);
+
+	void SetDepth(int x, int y, float depthVal);
+	float GetDepth(int x, int y);
+
+	uint32_t* colorBuffer;
+private:
+	const uint32_t alphaMask = 0xFF000000;
+	const uint32_t redMask = 0x00FF0000;
+	const uint32_t greenMask = 0x0000FF00;
+	const uint32_t blueMask = 0x000000FF;
+	float4 backgroundColor = float4(0, 181, 226, 255);
+	float* depthBuffer;
+	int width;
+	int height;
+};
+

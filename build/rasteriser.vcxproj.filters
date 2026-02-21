@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Audio\AudioEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\FloatTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\InputManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\Maths.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Graphics\BMPImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Graphics\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Graphics\Color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Graphics\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Graphics\RenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{23E6308A-3834-3766-8A29-1FAEF1CCB884}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
