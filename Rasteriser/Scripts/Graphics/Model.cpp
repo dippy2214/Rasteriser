@@ -1,5 +1,6 @@
 #include "Model.h"
 #include "../Core/Maths.h"
+#include "Rasteriser.h"
 
 #include <sstream>
 #include <iostream>
@@ -178,13 +179,6 @@ void Model::Render(RenderTarget* renderTarget, Camera* cam)
     int tilesY = (height + TILE_SIZE - 1) / TILE_SIZE;
     int numTiles = tilesX * tilesY;
 
-    struct Tile
-    {
-        int minX, maxX;
-        int minY, maxY;
-        std::vector<int> triangles;
-    };
-
     std::vector<Tile> tiles(numTiles);
 
     //initialize tiles
@@ -207,11 +201,6 @@ void Model::Render(RenderTarget* renderTarget, Camera* cam)
     }
 
     //transform + bin triangles
-    struct ScreenTri
-    {
-        float3 a, b, c;
-        int triIndex;
-    };
 
     std::vector<ScreenTri> screenTris(numTriangles);
 

@@ -1,24 +1,13 @@
 //...and we're using the sokol_audio single-header library to stream audio data
 //to our soundcard.
 #define SOKOL_IMPL
-#include "sokol_audio.h"
-
 #define DR_WAV_IMPLEMENTATION
-#include "dr_wav.h"
 
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include <iostream>
-#include <string>
-#include <vector>
-#include <memory>
-#include <unordered_map>
-#include <atomic>
 
+#include "AudioEngine.h"
 #include "LockFreeQueue.h"
-
-
-static const int NUMVOICES = 8;
 
 //------------------------------------------------------------------------------
 ///	This struct will get passed in to audioCallback().
@@ -26,65 +15,14 @@ static const int NUMVOICES = 8;
 	Use it to store any data that you want to remain persistent between calls to
 	audioCallback().
  */
-struct SoundData
+
+AudioEngine::~AudioEngine()
 {
-	unsigned int channels = 0;
-	unsigned int sampleRate = 0;
-	drwav_uint64 numFrames = 0;
-	std::vector<float> rawData;
-};
+	//Close the soundcard, clean up after ourselves.
+	saudio_shutdown();
+}
 
-class SoundLoader
-{
-	std::unordered_map<std::string, SoundData> sounds;
-
-public:
-	bool LoadSound(const std::string soundName, const char* fileName) {
-		SoundData soundData;
-		
-		std::unique_ptr<float> data(drwav_open_file_and_read_pcm_frames_f32(fileName,
-			&soundData.channels,
-			&soundData.sampleRate,
-			&soundData.numFrames,
-			NULL));
-
-		if (!data)
-		{
-			std::cout << "Could not open audio file and read data!\n";
-			return 1;
-		}
-
-		soundData.rawData = std::vector<float>(data.get(), data.get() + (soundData.numFrames * soundData.channels));
-
-		sounds.insert({ soundName, soundData });
-	}
-
-	SoundData* GetSound(std::string key)
-	{
-		if (sounds.count(key) == 0)
-		{
-			std::cout << "Could not find sound with this key!\n";
-			return nullptr;
-		}
-
-		return &sounds.at(key);
-	}
-};
-
-struct Voice
-{
-	std::atomic<bool> isActive = false;
-	std::atomic<bool> isLooping = false;
-	std::atomic<SoundData*> soundData = nullptr;
-	std::atomic<int> writtenFrameCount = 0;
-};
-
-struct AudioData
-{
-	Voice voices[NUMVOICES];
-};
-
-void RenderVoiceToBuffer(float* buffer, Voice* voice, int frame)
+void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int frame)
 {
 	if (voice->isActive)
 	{
@@ -117,7 +55,7 @@ void RenderVoiceToBuffer(float* buffer, Voice* voice, int frame)
 /*!
 	When the function returns our audio data will get passed to the soundcard.
  */
-void audioCallback(float *buffer,	//A buffer of float audio samples for us to fill.
+void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples for us to fill.
 				   int numFrames,	//The number of frames in this buffer (you can think of a frame as a multi-channel sample; mono = 1 sample per frame; stereo = 2 samples per frame, etc.).
 				   int numChannels,	//The number of channels this buffer represents (1: mono).
 				   void *userData)	//Our AudioData struct.
@@ -146,17 +84,17 @@ void audioCallback(float *buffer,	//A buffer of float audio samples for us to fi
 }
 
 //------------------------------------------------------------------------------
-int main(int argc, char **argv)
+int AudioEngine::AudioInit(InputManager* inputMan)
 {
+	inputManager = inputMan;
+
 	//We store any data we might use in our audio callback in this struct.
-	AudioData audioData;
 
 	//--------------------------------------------------------------------------
 	// Load sound file data here.
 	//--------------------------------------------------------------------------
-	SoundLoader loader;
-	loader.LoadSound("loop", "Loop.wav");
-	loader.LoadSound("stereo", "Stereo.wav");
+	loader.LoadSound("loop", "Assets/Audio/Loop.wav");
+	loader.LoadSound("stereo", "Assets/Audio/Stereo.wav");
 	
 	//Create a sokol_audio audio descriptor, zero its members.
 	saudio_desc audioDescriptor = {};
@@ -164,7 +102,7 @@ int main(int argc, char **argv)
 	//Request stereo audio.
 	audioDescriptor.num_channels = 2;
 	//Pass in our audio callback.
-	audioDescriptor.stream_userdata_cb = audioCallback;
+	audioDescriptor.stream_userdata_cb = AudioEngine::audioCallback;
 	//Pass in any user data (stored in the AudioData struct) to the audio callback.
 	audioDescriptor.user_data = (void *)&audioData;
 
@@ -198,41 +136,20 @@ int main(int argc, char **argv)
 
 		return 1;
 	}
-	else
-		std::cout << "(type [x] to quit)" << std::endl;
 
 	// <at this point, audio is now being processed>
 
-	//We use cin.get() as a cheap way of blocking execution on the main thread
-	//until the user decides to quit. We can also use it as a way to introduce
-	//user input (e.g. trigger a sound when a particular key is entered)
-	//(note that audio processing happens in a separate audio thread)
-
-
-	int input = std::cin.get();
-	while(input != 'x')
-	{
-		switch (input)
-		{
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-			audioData.voices[input - 49].isActive = !audioData.voices[input-49].isActive;
-			break;
-		default:
-			break;
-		}
-
-		input = std::cin.get();
-	}
-
-	//Close the soundcard, clean up after ourselves.
-	saudio_shutdown();
-
 	return 0;
+}
+
+void AudioEngine::AudioInputs()
+{
+	if (inputManager->IsKeyPressed('1')) { audioData.voices[0].isActive = !audioData.voices[0].isActive; }
+	if (inputManager->IsKeyPressed('2')) { audioData.voices[1].isActive = !audioData.voices[1].isActive; }
+	if (inputManager->IsKeyPressed('3')) { audioData.voices[2].isActive = !audioData.voices[2].isActive; }
+	if (inputManager->IsKeyPressed('4')) { audioData.voices[3].isActive = !audioData.voices[3].isActive; }
+	if (inputManager->IsKeyPressed('5')) { audioData.voices[4].isActive = !audioData.voices[4].isActive; }
+	if (inputManager->IsKeyPressed('6')) { audioData.voices[5].isActive = !audioData.voices[5].isActive; }
+	if (inputManager->IsKeyPressed('7')) { audioData.voices[6].isActive = !audioData.voices[6].isActive; }
+	if (inputManager->IsKeyPressed('8')) { audioData.voices[7].isActive = !audioData.voices[7].isActive; }
 }

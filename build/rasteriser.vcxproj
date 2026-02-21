@@ -114,18 +114,9 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>	</Message>
+      <Message></Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Models" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Debug/Models"
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Textures" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Debug/Textures"
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Debug/Assets"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -179,18 +170,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>	</Message>
+      <Message></Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Models" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Release/Models"
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Textures" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Release/Textures"
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Release/Assets"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -244,18 +226,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>	</Message>
+      <Message></Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Models" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/MinSizeRel/Models"
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Textures" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/MinSizeRel/Textures"
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/MinSizeRel/Assets"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -308,18 +281,9 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>	</Message>
+      <Message></Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Models" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/RelWithDebInfo/Models"
-if %errorlevel% neq 0 goto :cmEnd
-:cmEnd
-endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
-:cmErrorLevel
-exit /b %1
-:cmDone
-if %errorlevel% neq 0 goto :VCEnd
-setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Textures" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/RelWithDebInfo/Textures"
+"C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/RelWithDebInfo/Assets"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone

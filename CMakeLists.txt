@@ -15,18 +15,9 @@ target_link_libraries(rasteriser PRIVATE
     user32
 )
 
-# Copy assets folder to the build output directory
-set(ASSET_FOLDERS
-    Models
-    Textures
-)
 
-foreach(ASSET ${ASSET_FOLDERS})
-    if(EXISTS "${CMAKE_SOURCE_DIR}/Rasteriser/${ASSET}")
-        add_custom_command(TARGET rasteriser POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-                "${CMAKE_SOURCE_DIR}/Rasteriser/${ASSET}"
-                "$<TARGET_FILE_DIR:rasteriser>/${ASSET}"
-        )
-    endif()
-endforeach()
+add_custom_command(TARGET rasteriser POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/Rasteriser/Assets"
+        "$<TARGET_FILE_DIR:rasteriser>/Assets"
+    )

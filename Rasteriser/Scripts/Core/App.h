@@ -3,11 +3,13 @@
 #include <Windows.h>
 
 #include "FloatTypes.h"
+#include "InputManager.h"
+#include "Maths.h"
 #include "../Graphics/Model.h"
 #include "../Graphics/RenderTarget.h"
-#include "Maths.h"
 #include "../Graphics/Camera.h"
-#include "InputManager.h"
+#include "../Audio/AudioEngine.h"
+
 
 class App
 {
@@ -30,6 +32,7 @@ public:
 	void Render();
 
 private:
+	AudioEngine audioEngine;
 	InputManager* inputManager;
 	Camera camera;
 	Model* cube;

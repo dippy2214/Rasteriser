@@ -4,13 +4,13 @@
 #include <cstdlib>
 #include <algorithm>
 
-#include "../Graphics/BMPImage.h"
 #include "FloatTypes.h"
-#include "../Graphics/Model.h"
-#include "../Graphics/RenderTarget.h"
 #include "Maths.h"
 #include "App.h"
 #include "Transform.h"
+#include "../Graphics/BMPImage.h"
+#include "../Graphics/Model.h"
+#include "../Graphics/RenderTarget.h"
 
 
 App::App(int w, int h, InputManager* inputManager, uint32_t* frameBuffer)
@@ -24,11 +24,14 @@ void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBu
 	height = HEIGHT;
 	inputManager = inputs;
 
-	cube = new Model("Models/evilmonkey.obj", "Textures/evilmonkeytexture.bmp");
+	cube = new Model("Assets/Models/evilmonkey.obj", "Assets/Textures/evilmonkeytexture.bmp");
 	cube->position = float3(0, 0, 15);
 	renderer = new RenderTarget(width, height, frameBuffer);
 
 	camera.position = float3(0, 0, 0);
+
+	
+	audioEngine.AudioInit(inputManager);
 }
 
 void App::ProcessFrame(HWND viewPort, float dt)
@@ -57,6 +60,8 @@ void App::Update(float deltaTime)
 
 void App::HandleInput(float deltaTime)
 {
+	audioEngine.AudioInputs();
+
 	float3 camMoveDelta;
 
 	
