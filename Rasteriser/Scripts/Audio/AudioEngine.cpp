@@ -4,7 +4,8 @@
 #define DR_WAV_IMPLEMENTATION
 
 #define _USE_MATH_DEFINES
-#include <cmath>
+#include <math.h>
+#include <algorithm>
 
 #include "AudioEngine.h"
 #include "LockFreeQueue.h"
@@ -44,20 +45,27 @@ void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int frame, Tr
 		{
 			AudioSource* audioSource = voice->audioSource;
 			float distance = (audioSource->position - listener->position).Length();
+			float gain = 0;
+			
 			if (distance < audioSource->minDistance)
 			{
 				distance = audioSource->minDistance;
 			}
-			
-			float gain = 0;
 			if (distance <= audioSource->maxDistance)
 			{
 				gain = audioSource->minDistance / (audioSource->minDistance + audioSource->rolloff * (distance - audioSource->minDistance));
 			}
-			
 
-			leftSample *= gain;
-			rightSample *= gain;
+			float3 toSource = (audioSource->position - listener->position).Normalised();
+			float pan = toSource.Dot(listener->basisVectors.ihat);
+			pan = std::clamp(pan, -1.0f, 1.0f);
+
+			float angle = (pan + 1.0f) * 0.25f * M_PI;
+			float leftGain = std::cos(pan) * gain;
+			float rightGain = std::sin(pan) * gain;
+
+			leftSample *= leftGain;
+			rightSample *= rightGain;
 		}
 
 		buffer[(2 * frame)] = leftSample;
