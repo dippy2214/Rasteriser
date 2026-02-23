@@ -64,6 +64,13 @@ void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int frame, Tr
 			float leftGain = std::cos(pan) * gain;
 			float rightGain = std::sin(pan) * gain;
 
+			float forward = toSource.Dot(listener->basisVectors.jhat);
+			if (forward < 0)
+			{
+				leftGain *= 0.8f;
+				rightGain *= 0.8f;
+			}
+
 			leftSample *= leftGain;
 			rightSample *= rightGain;
 		}
