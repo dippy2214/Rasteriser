@@ -30,8 +30,11 @@ void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBu
 
 	camera.position = float3(0, 0, 0);
 
-	
+	audioSource = new AudioSource;
+	audioSource->position = float3(0, 0, 15);
 	audioEngine.AudioInit(inputManager);
+	audioEngine.SetActiveListener(&camera);
+	audioEngine.AddSourceToVoice(audioSource, 0);
 }
 
 void App::ProcessFrame(HWND viewPort, float dt)

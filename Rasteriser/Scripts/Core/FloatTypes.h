@@ -155,9 +155,10 @@ public:
 		return output;
 	}
 
+	float Length() { return sqrt((x * x) + (y * y) + (z * z)); }
 	float Dot(float3 b) { return (x * b.x) + (y * b.y) + (z * b.z); }
 	float3 Normalised() { 
-		float length = sqrt((x * x) + (y * y) + (z * z));
+		float length = Length();
 		if (length == 0) { return float3(0, 0, 0); }
 		return float3(x / length, y / length, z / length);
 	}

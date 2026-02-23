@@ -4,6 +4,9 @@
     <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Audio\AudioEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Audio\AudioSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

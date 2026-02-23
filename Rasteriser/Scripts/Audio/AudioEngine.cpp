@@ -22,23 +22,49 @@ AudioEngine::~AudioEngine()
 	saudio_shutdown();
 }
 
-void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int frame)
+void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int frame, Transform* listener)
 {
 	if (voice->isActive)
 	{
-		if (voice->soundData.load()->channels == 2) //handle stereo files
+		float leftSample = 0;
+		float rightSample = 0;
+		if (voice->soundData->channels == 2) //handle stereo files
 		{
-			buffer[(2 * frame)] += (voice->soundData.load()->rawData[voice->writtenFrameCount]);
-			buffer[(2 * frame) + 1] += (voice->soundData.load()->rawData[voice->writtenFrameCount + 1]);
+			leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
+			rightSample += (voice->soundData->rawData[voice->writtenFrameCount + 1]);
 			voice->writtenFrameCount++;
 		}
 		else //handle mono files
 		{
-			buffer[(2 * frame)] += (voice->soundData.load()->rawData[voice->writtenFrameCount]);
-			buffer[(2 * frame) + 1] += (voice->soundData.load()->rawData[voice->writtenFrameCount]);
+			leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
+			rightSample += (voice->soundData->rawData[voice->writtenFrameCount]);
 		}
+
+		if (voice->audioSource != nullptr && listener != nullptr)
+		{
+			AudioSource* audioSource = voice->audioSource;
+			float distance = (audioSource->position - listener->position).Length();
+			if (distance < audioSource->minDistance)
+			{
+				distance = audioSource->minDistance;
+			}
+			
+			float gain = 0;
+			if (distance <= audioSource->maxDistance)
+			{
+				gain = audioSource->minDistance / (audioSource->minDistance + audioSource->rolloff * (distance - audioSource->minDistance));
+			}
+			
+
+			leftSample *= gain;
+			rightSample *= gain;
+		}
+
+		buffer[(2 * frame)] = leftSample;
+		buffer[(2 * frame) + 1] = rightSample;
+
 		voice->writtenFrameCount++;
-		if (voice->writtenFrameCount >= voice->soundData.load()->numFrames)
+		if (voice->writtenFrameCount >= voice->soundData->numFrames)
 		{
 			if (!voice->isLooping)
 			{
@@ -76,7 +102,7 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 			
 			for (int v = 0; v < NUMVOICES; ++v)
 			{
-				RenderVoiceToBuffer(buffer, &data->voices[v], i);
+				RenderVoiceToBuffer(buffer, &data->voices[v], i, data->listenerTransform);
 			}
 			
 		}
@@ -113,6 +139,7 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 		return 1;
 	}
 	audioData.voices[0].isLooping = true;
+	
 
 	for (int i = 1; i < NUMVOICES; ++i)
 	{
@@ -152,4 +179,14 @@ void AudioEngine::AudioInputs()
 	if (inputManager->IsKeyPressed('6')) { audioData.voices[5].isActive = !audioData.voices[5].isActive; }
 	if (inputManager->IsKeyPressed('7')) { audioData.voices[6].isActive = !audioData.voices[6].isActive; }
 	if (inputManager->IsKeyPressed('8')) { audioData.voices[7].isActive = !audioData.voices[7].isActive; }
+}
+
+void AudioEngine::SetActiveListener(Transform* trans)
+{
+	audioData.listenerTransform = trans;
+}
+
+void AudioEngine::AddSourceToVoice(AudioSource* audioSource, int voiceIndex)
+{
+	audioData.voices[voiceIndex].audioSource = audioSource;
 }

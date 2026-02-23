@@ -37,5 +37,6 @@ private:
 	Camera camera;
 	Model* cube;
 	RenderTarget* renderer;
+	AudioSource* audioSource;
 };
 

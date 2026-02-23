@@ -365,6 +365,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Audio\AudioEngine.cpp" />
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Audio\AudioSource.cpp" />
     <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\App.cpp" />
     <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\FloatTypes.cpp" />
     <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Core\InputManager.cpp" />
