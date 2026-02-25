@@ -8,7 +8,6 @@
 #include <algorithm>
 
 #include "AudioEngine.h"
-#include "LockFreeQueue.h"
 
 //------------------------------------------------------------------------------
 ///	This struct will get passed in to audioCallback().

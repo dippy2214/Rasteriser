@@ -11,14 +11,24 @@ struct SoundData
 	unsigned int channels = 0;
 	unsigned int sampleRate = 0;
 	drwav_uint64 numFrames = 0;
-	std::vector<float> rawData;
+	float* rawData;
 };
 
 class SoundLoader
 {
+private:
 	std::unordered_map<std::string, SoundData> sounds;
 
 public:
+	~SoundLoader()
+	{
+		//clean up sound rawData pointers created by drwav here
+		for (auto i = sounds.begin(); i != sounds.end(); ++i)
+		{
+			drwav_free(i->second.rawData, NULL);
+		}
+	}
+
 	int LoadSound(const std::string& soundName, const std::string& fileName) {
 		SoundData soundData;
 		
@@ -33,11 +43,15 @@ public:
 			std::cout << "Could not open audio file and read data!\n";
 			return 1;
 		}
+		//technically speaking this copies memory
+		//sub optimal but I ran into out of scope issues without doing this
+		//and it is convinient for audio data to be structured as a vector
+		//soundData.rawData = std::vector<float>(data, data + (soundData.numFrames * soundData.channels));
 
-		soundData.rawData = std::vector<float>(data, data + (soundData.numFrames * soundData.channels));
+		soundData.rawData = data;
 
 		sounds.insert({ soundName, soundData });
-		drwav_free(data, NULL);
+		//drwav_free(data, NULL);
         return 0;
 	}
 
