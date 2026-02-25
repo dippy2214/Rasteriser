@@ -19,10 +19,10 @@ class SoundLoader
 	std::unordered_map<std::string, SoundData> sounds;
 
 public:
-	int LoadSound(const std::string soundName, const char* fileName) {
+	int LoadSound(const std::string& soundName, const std::string& fileName) {
 		SoundData soundData;
 		
-		std::unique_ptr<float> data(drwav_open_file_and_read_pcm_frames_f32(fileName,
+		float* data(drwav_open_file_and_read_pcm_frames_f32(fileName.c_str(),
 			&soundData.channels,
 			&soundData.sampleRate,
 			&soundData.numFrames,
@@ -34,13 +34,14 @@ public:
 			return 1;
 		}
 
-		soundData.rawData = std::vector<float>(data.get(), data.get() + (soundData.numFrames * soundData.channels));
+		soundData.rawData = std::vector<float>(data, data + (soundData.numFrames * soundData.channels));
 
 		sounds.insert({ soundName, soundData });
+		drwav_free(data, NULL);
         return 0;
 	}
 
-	SoundData* GetSound(std::string key)
+	SoundData* GetSound(const std::string& key)
 	{
 		if (sounds.count(key) == 0)
 		{

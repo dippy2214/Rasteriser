@@ -23,71 +23,78 @@ AudioEngine::~AudioEngine()
 	saudio_shutdown();
 }
 
+void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, Transform* listener, float* leftSample, float*  rightSample)
+{
+	float distance = (audioSource->position - listener->position).Length();
+	float gain = 0;
+	
+	//distance based attenuation
+	distance = std::max(distance, audioSource->minDistance);
+	if (distance <= audioSource->maxDistance)
+	{
+		gain = audioSource->minDistance / (audioSource->minDistance + audioSource->rolloff * (distance - audioSource->minDistance));
+	}
+
+	//directional panning (interaural level difference)
+	float3 toSource = (audioSource->position - listener->position).Normalised();
+	float pan = toSource.Dot(listener->basisVectors.ihat);
+	pan = std::clamp(pan, -1.0f, 1.0f);
+
+	float angle = (pan + 1.0f) * 0.25f * M_PI;
+
+	//distance based attenuation gain applied here
+	float leftGain = std::cos(pan) * gain;
+	float rightGain = std::sin(pan) * gain;
+
+	float forward = toSource.Dot(listener->basisVectors.jhat);
+
+	if (forward < 0)
+	{
+		leftGain *= 0.8f;
+		rightGain *= 0.8f;
+	}
+
+	*leftSample *= leftGain;
+	*rightSample *= rightGain;
+}
+
 void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int frame, Transform* listener)
 {
-	if (voice->isActive)
+	if (!voice) return;
+	if (!voice->isActive) return;
+	
+	float leftSample = 0;
+	float rightSample = 0;
+	if (voice->soundData->channels == 2) //handle stereo files
 	{
-		float leftSample = 0;
-		float rightSample = 0;
-		if (voice->soundData->channels == 2) //handle stereo files
-		{
-			leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
-			rightSample += (voice->soundData->rawData[voice->writtenFrameCount + 1]);
-			voice->writtenFrameCount++;
-		}
-		else //handle mono files
-		{
-			leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
-			rightSample += (voice->soundData->rawData[voice->writtenFrameCount]);
-		}
-
-		if (voice->audioSource != nullptr && listener != nullptr)
-		{
-			AudioSource* audioSource = voice->audioSource;
-			float distance = (audioSource->position - listener->position).Length();
-			float gain = 0;
-			
-			if (distance < audioSource->minDistance)
-			{
-				distance = audioSource->minDistance;
-			}
-			if (distance <= audioSource->maxDistance)
-			{
-				gain = audioSource->minDistance / (audioSource->minDistance + audioSource->rolloff * (distance - audioSource->minDistance));
-			}
-
-			float3 toSource = (audioSource->position - listener->position).Normalised();
-			float pan = toSource.Dot(listener->basisVectors.ihat);
-			pan = std::clamp(pan, -1.0f, 1.0f);
-
-			float angle = (pan + 1.0f) * 0.25f * M_PI;
-			float leftGain = std::cos(pan) * gain;
-			float rightGain = std::sin(pan) * gain;
-
-			float forward = toSource.Dot(listener->basisVectors.jhat);
-			if (forward < 0)
-			{
-				leftGain *= 0.8f;
-				rightGain *= 0.8f;
-			}
-
-			leftSample *= leftGain;
-			rightSample *= rightGain;
-		}
-
-		buffer[(2 * frame)] = leftSample;
-		buffer[(2 * frame) + 1] = rightSample;
-
+		leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
+		rightSample += (voice->soundData->rawData[voice->writtenFrameCount + 1]);
 		voice->writtenFrameCount++;
-		if (voice->writtenFrameCount >= voice->soundData->numFrames)
-		{
-			if (!voice->isLooping)
-			{
-				voice->isActive = false;
-			}
-			voice->writtenFrameCount = 0;
-		}
 	}
+	else //handle mono files
+	{
+		leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
+		rightSample += (voice->soundData->rawData[voice->writtenFrameCount]);
+	}
+
+	if (voice->audioSource != nullptr && listener != nullptr)
+	{
+		ApplySpatialEffectsToStereoSamples(voice->audioSource, listener, &leftSample, &rightSample);
+	}
+
+	buffer[(2 * frame)] = leftSample;
+	buffer[(2 * frame) + 1] = rightSample;
+
+	voice->writtenFrameCount++;
+	if (voice->writtenFrameCount >= voice->soundData->numFrames)
+	{
+		if (!voice->isLooping)
+		{
+			voice->isActive = false;
+		}
+		voice->writtenFrameCount = 0;
+	}
+	
 }
 
 
@@ -108,20 +115,20 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 
 
 	//Just in case...
-	if(data)
+	if(!data) return;
+	
+	for(int i=0;i<numFrames;++i)
 	{
-		for(int i=0;i<numFrames;++i)
+		buffer[(2*i)] = 0.0f;
+		buffer[(2*i) + 1] = 0.0f;
+		
+		for (int v = 0; v < NUMVOICES; ++v)
 		{
-			buffer[(2*i)] = 0.0f;
-			buffer[(2*i) + 1] = 0.0f;
-			
-			for (int v = 0; v < NUMVOICES; ++v)
-			{
-				RenderVoiceToBuffer(buffer, &data->voices[v], i, data->listenerTransform);
-			}
-			
+			RenderVoiceToBuffer(buffer, &data->voices[v], i, data->listenerTransform);
 		}
+		
 	}
+	
 }
 
 //------------------------------------------------------------------------------
@@ -175,7 +182,6 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 	if(!saudio_isvalid())
 	{
 		std::cout << "Could not initialise sokol_audio. Exiting." << std::endl;
-
 		return 1;
 	}
 
