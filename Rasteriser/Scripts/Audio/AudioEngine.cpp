@@ -57,11 +57,11 @@ void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, T
 	*rightSample *= rightGain;
 }
 
-void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int numFrames, Transform* listener)
+void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, int numFrames, Transform* listener)
 {
 	if (!voice) return;
 	if (!voice->isActive) return;
-	
+
 	for(int i=0;i<numFrames;++i)
 	{	
 		float leftSample = 0;
@@ -83,8 +83,8 @@ void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int numFrames
 			ApplySpatialEffectsToStereoSamples(voice->audioSource, listener, &leftSample, &rightSample);
 		}
 
-		buffer[(2 * i)] = leftSample;
-		buffer[(2 * i) + 1] = rightSample;
+		buffer->at(2 * i) += leftSample;
+		buffer->at((2 * i) + 1) += rightSample;
 
 		voice->writtenFrameCount++;
 		if (voice->writtenFrameCount >= voice->soundData->numFrames)
@@ -114,22 +114,17 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 	//Get the samplerate our soundcard is running at.
 	const float samplerate((float)saudio_sample_rate());
 
-
 	//Just in case...
 	if(!data) return;
-	
-	for (int i = 0; i < numFrames; ++i)
-	{
-		buffer[(2*i)] = 0.0f;
-		buffer[(2*i) + 1] = 0.0f;
-	}
+
+	data->mixer->buffer = std::vector<float>(numFrames*2);
 
 	for (int v = 0; v < NUMVOICES; ++v)
 	{
-		RenderVoiceToBuffer(buffer, &data->voices[v], numFrames, data->listenerTransform);
+		RenderVoiceToBuffer(&data->mixer->buffer, &data->voices[v], numFrames, data->listenerTransform);
 	}
 	
-	
+	std::copy(data->mixer->buffer.begin(), data->mixer->buffer.end(), buffer);
 }
 
 //------------------------------------------------------------------------------
@@ -154,6 +149,8 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 	audioDescriptor.stream_userdata_cb = AudioEngine::audioCallback;
 	//Pass in any user data (stored in the AudioData struct) to the audio callback.
 	audioDescriptor.user_data = (void *)&audioData;
+
+	audioData.mixer = mixerManager.GetMixer("default");
 
 	audioData.voices[0].soundData = loader.GetSound("stereo");
 	if (audioData.voices[0].soundData == nullptr)

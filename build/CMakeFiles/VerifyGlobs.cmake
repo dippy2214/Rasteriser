@@ -7,6 +7,7 @@ file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Users/joshu/Desktop/Person
 set(OLD_GLOB
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Audio/AudioEngine.cpp"
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Audio/AudioSource.cpp"
+  "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Audio/MixerManager.cpp"
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/App.cpp"
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/FloatTypes.cpp"
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/InputManager.cpp"

@@ -2,6 +2,8 @@
 #include "sokol_audio.h"
 #include "SoundLoader.h"
 #include "AudioSource.h"
+#include "Mixer.h"
+#include "MixerManager.h"
 #include "../Core/InputManager.h"
 #include "../Core/Transform.h"
 
@@ -16,11 +18,13 @@ struct Voice
 	std::atomic<bool> isLooping = false;
 	SoundData* soundData = nullptr;
     AudioSource* audioSource = nullptr;
+
 	std::atomic<int> writtenFrameCount = 0;
 };
 
 struct AudioData
 {
+    Mixer* mixer;
     Transform* listenerTransform;
 	Voice voices[NUMVOICES];
 };
@@ -36,11 +40,12 @@ class AudioEngine
 
     private:
     static void ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, Transform* listener, float* leftSample, float*  rightSample);
-    static void RenderVoiceToBuffer(float* buffer, Voice* voice, int numFrames, Transform* listener);
+    static void RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, int numFrames, Transform* listener);
     static void audioCallback(float *buffer, int numFrames, int numChannels, void *userData);
     
     SoundLoader loader;
     AudioData audioData;
+    MixerManager mixerManager;
     InputManager* inputManager;
 
 };
