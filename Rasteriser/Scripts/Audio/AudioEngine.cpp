@@ -63,10 +63,7 @@ void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int numFrames
 	if (!voice->isActive) return;
 	
 	for(int i=0;i<numFrames;++i)
-	{
-		buffer[(2*i)] = 0.0f;
-		buffer[(2*i) + 1] = 0.0f;
-		
+	{	
 		float leftSample = 0;
 		float rightSample = 0;
 		if (voice->soundData->channels == 2) //handle stereo files
@@ -121,7 +118,12 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 	//Just in case...
 	if(!data) return;
 	
-	
+	for (int i = 0; i < numFrames; ++i)
+	{
+		buffer[(2*i)] = 0.0f;
+		buffer[(2*i) + 1] = 0.0f;
+	}
+
 	for (int v = 0; v < NUMVOICES; ++v)
 	{
 		RenderVoiceToBuffer(buffer, &data->voices[v], numFrames, data->listenerTransform);
