@@ -36,7 +36,7 @@ class AudioEngine
 
     private:
     static void ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, Transform* listener, float* leftSample, float*  rightSample);
-    static void RenderVoiceToBuffer(float* buffer, Voice* voice, int frame, Transform* listener);
+    static void RenderVoiceToBuffer(float* buffer, Voice* voice, int numFrames, Transform* listener);
     static void audioCallback(float *buffer, int numFrames, int numChannels, void *userData);
     
     SoundLoader loader;

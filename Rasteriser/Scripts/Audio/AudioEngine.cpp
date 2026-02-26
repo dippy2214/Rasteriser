@@ -57,43 +57,48 @@ void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, T
 	*rightSample *= rightGain;
 }
 
-void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int frame, Transform* listener)
+void AudioEngine::RenderVoiceToBuffer(float* buffer, Voice* voice, int numFrames, Transform* listener)
 {
 	if (!voice) return;
 	if (!voice->isActive) return;
 	
-	float leftSample = 0;
-	float rightSample = 0;
-	if (voice->soundData->channels == 2) //handle stereo files
+	for(int i=0;i<numFrames;++i)
 	{
-		leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
-		rightSample += (voice->soundData->rawData[voice->writtenFrameCount + 1]);
-		voice->writtenFrameCount++;
-	}
-	else //handle mono files
-	{
-		leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
-		rightSample += (voice->soundData->rawData[voice->writtenFrameCount]);
-	}
-
-	if (voice->audioSource != nullptr && listener != nullptr)
-	{
-		ApplySpatialEffectsToStereoSamples(voice->audioSource, listener, &leftSample, &rightSample);
-	}
-
-	buffer[(2 * frame)] = leftSample;
-	buffer[(2 * frame) + 1] = rightSample;
-
-	voice->writtenFrameCount++;
-	if (voice->writtenFrameCount >= voice->soundData->numFrames)
-	{
-		if (!voice->isLooping)
+		buffer[(2*i)] = 0.0f;
+		buffer[(2*i) + 1] = 0.0f;
+		
+		float leftSample = 0;
+		float rightSample = 0;
+		if (voice->soundData->channels == 2) //handle stereo files
 		{
-			voice->isActive = false;
+			leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
+			rightSample += (voice->soundData->rawData[voice->writtenFrameCount + 1]);
+			voice->writtenFrameCount++;
 		}
-		voice->writtenFrameCount = 0;
+		else //handle mono files
+		{
+			leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
+			rightSample += (voice->soundData->rawData[voice->writtenFrameCount]);
+		}
+
+		if (voice->audioSource != nullptr && listener != nullptr)
+		{
+			ApplySpatialEffectsToStereoSamples(voice->audioSource, listener, &leftSample, &rightSample);
+		}
+
+		buffer[(2 * i)] = leftSample;
+		buffer[(2 * i) + 1] = rightSample;
+
+		voice->writtenFrameCount++;
+		if (voice->writtenFrameCount >= voice->soundData->numFrames)
+		{
+			if (!voice->isLooping)
+			{
+				voice->isActive = false;
+			}
+			voice->writtenFrameCount = 0;
+		}
 	}
-	
 }
 
 
@@ -116,17 +121,12 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 	//Just in case...
 	if(!data) return;
 	
-	for(int i=0;i<numFrames;++i)
+	
+	for (int v = 0; v < NUMVOICES; ++v)
 	{
-		buffer[(2*i)] = 0.0f;
-		buffer[(2*i) + 1] = 0.0f;
-		
-		for (int v = 0; v < NUMVOICES; ++v)
-		{
-			RenderVoiceToBuffer(buffer, &data->voices[v], i, data->listenerTransform);
-		}
-		
+		RenderVoiceToBuffer(buffer, &data->voices[v], numFrames, data->listenerTransform);
 	}
+	
 	
 }
 
