@@ -124,6 +124,8 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 		RenderVoiceToBuffer(&data->mixer->buffer, &data->voices[v], numFrames, data->listenerTransform);
 	}
 	
+	
+
 	std::copy(data->mixer->buffer.begin(), data->mixer->buffer.end(), buffer);
 }
 
