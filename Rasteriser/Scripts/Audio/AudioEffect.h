@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 
 class AudioEffect
 {
@@ -10,12 +11,20 @@ class HardClip : public AudioEffect
 {
     public:
     HardClip(float limit) { threshold = limit; };
-    void ApplyEffect(float* sample) override { 
-        if(*sample > threshold) *sample = threshold; 
-        else if (*sample < -threshold) *sample = -threshold;
-    };
+    void ApplyEffect(float* sample) override { *sample = std::clamp(*sample, -threshold, threshold); };
     
     private:
-    float threshold = 0.8f;
-    
+    float threshold;
 };
+
+class SoftClip : public AudioEffect
+{
+    public:
+    SoftClip(float clipperDrive, float gain) { drive = clipperDrive; outputGain = gain; };
+    void ApplyEffect(float* sample) override { *sample = std::tanh(*sample * drive) * outputGain; };
+
+    private:
+    float drive;
+    float outputGain;
+};
+
