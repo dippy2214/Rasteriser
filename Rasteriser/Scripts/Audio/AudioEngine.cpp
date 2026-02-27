@@ -175,12 +175,6 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 		audioData.voices[i].mixer = audioData.mixerManager.GetMixer("default");
 	}
 	
-	Mixer* hardClipper = audioData.mixerManager.AddMixer("hard clipper");
-	hardClipper->effects.emplace_back(std::make_unique<HardClip>(0.1f));
-	audioData.voices[1].mixer = hardClipper;
-
-	
-	
 	//Initialise sokol_audio, and start the soundcard processing audio.
 	saudio_setup(&audioDescriptor);
 
@@ -190,10 +184,20 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 		std::cout << "Could not initialise sokol_audio. Exiting." << std::endl;
 		return 1;
 	}
-
-	audioData.mixerManager.SetMaxSamples(saudio_buffer_frames()*2);
-
 	// <at this point, audio is now being processed>
+	audioData.mixerManager.SetMaxSamples(saudio_buffer_frames()*2);
+	
+	Mixer* hardClipper = audioData.mixerManager.AddMixer("hard clipper");
+	hardClipper->effects.emplace_back(std::make_unique<HardClip>(0.07f));
+	audioData.voices[1].mixer = hardClipper;
+
+	Mixer* softClipper = audioData.mixerManager.AddMixer("soft clipper");
+	softClipper->effects.emplace_back(std::make_unique<SoftClip>(4.f, 0.5f));
+	audioData.voices[2].mixer = softClipper;
+
+	Mixer* lowPassFilter = audioData.mixerManager.AddMixer("low pass filter");
+	lowPassFilter->effects.emplace_back(std::make_unique<LowPassFilter>(200.f, static_cast<float>(saudio_sample_rate())));
+	audioData.voices[3].mixer = lowPassFilter;	
 
 	return 0;
 }
