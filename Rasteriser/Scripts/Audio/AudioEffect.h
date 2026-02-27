@@ -2,11 +2,20 @@
 
 class AudioEffect
 {
+    public:
     virtual void ApplyEffect(float* sample) = 0; 
 };
 
 class HardClip : public AudioEffect
 {
-    float threshold = 0.8;
-    void ApplyEffect(float* sample) override { if(*sample > 0.8f) *sample = 0.8f; };
+    public:
+    HardClip(float limit) { threshold = limit; };
+    void ApplyEffect(float* sample) override { 
+        if(*sample > threshold) *sample = threshold; 
+        else if (*sample < -threshold) *sample = -threshold;
+    };
+    
+    private:
+    float threshold = 0.8f;
+    
 };

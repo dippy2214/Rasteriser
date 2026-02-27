@@ -19,6 +19,7 @@ class MixerManager
     MixerManager();
     void SetMaxSamples(int maxSamp);
     void ZeroAllBuffers();
+    void ApplyAllMixerEffects();
     void AddAllMixersIntoBuffer(float* buf, int numFrames);
     Mixer* AddMixer(std::string name);
     Mixer* GetMixer(std::string name);

@@ -7,6 +7,9 @@
     <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Audio\AudioSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Audio\Mixer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="C:\Users\joshu\Desktop\Personal Programming project stuff\rasteriser\Rasteriser\Scripts\Audio\MixerManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -42,8 +42,8 @@ void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, T
 	float angle = (pan + 1.0f) * 0.25f * M_PI;
 
 	//distance based attenuation gain applied here
-	float leftGain = std::cos(pan) * gain;
-	float rightGain = std::sin(pan) * gain;
+	float leftGain = std::cos(angle) * gain;
+	float rightGain = std::sin(angle) * gain;
 
 	float forward = toSource.Dot(listener->basisVectors.jhat);
 
@@ -66,11 +66,13 @@ void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, 
 	{	
 		float leftSample = 0;
 		float rightSample = 0;
+
+		int frameIndex = voice->writtenFrameCount;
 		if (voice->soundData->channels == 2) //handle stereo files
 		{
-			leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
-			rightSample += (voice->soundData->rawData[voice->writtenFrameCount + 1]);
-			voice->writtenFrameCount++;
+			int sampleIndex = frameIndex * 2;
+			leftSample += (voice->soundData->rawData[sampleIndex]);
+			rightSample += (voice->soundData->rawData[sampleIndex + 1]);
 		}
 		else //handle mono files
 		{
@@ -83,8 +85,8 @@ void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, 
 			ApplySpatialEffectsToStereoSamples(voice->audioSource, listener, &leftSample, &rightSample);
 		}
 
-		buffer->at(2 * i) += leftSample;
-		buffer->at((2 * i) + 1) += rightSample;
+		(*buffer)[2 * i] += leftSample;
+		(*buffer)[(2 * i) + 1] += rightSample;
 
 		voice->writtenFrameCount++;
 		if (voice->writtenFrameCount >= voice->soundData->numFrames)
@@ -124,6 +126,7 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 		RenderVoiceToBuffer(&data->voices[v].mixer->buffer, &data->voices[v], numFrames, data->listenerTransform);
 	}
 	
+	data->mixerManager.ApplyAllMixerEffects();
 	std::fill(buffer, buffer + numFrames * numChannels, 0.0f);
 	data->mixerManager.AddAllMixersIntoBuffer(buffer, numFrames);
 }
@@ -171,6 +174,11 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 		audioData.voices[i].isLooping = true;
 		audioData.voices[i].mixer = audioData.mixerManager.GetMixer("default");
 	}
+	
+	Mixer* hardClipper = audioData.mixerManager.AddMixer("hard clipper");
+	hardClipper->effects.emplace_back(std::make_unique<HardClip>(0.1f));
+	audioData.voices[1].mixer = hardClipper;
+
 	
 	
 	//Initialise sokol_audio, and start the soundcard processing audio.

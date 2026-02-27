@@ -25,23 +25,31 @@ void MixerManager::ZeroAllBuffers()
     }
 }
 
+void MixerManager::ApplyAllMixerEffects()
+{
+    for (int i = 0; i < mixers.size(); ++i)
+    {
+        mixers[i].ApplyMixerEffects();
+    }
+}
+
 void MixerManager::AddAllMixersIntoBuffer(float* buf, int numFrames)
 {
     int numSamples = numFrames * 2;
 
     // Assume buf was zeroed beforehand
-    for (int i = 0; i < mixers.size(); ++i)
+    for (int i = 0; i < numSamples; ++i)
     {
-        for (int j = 0; j < numSamples; ++j)
+        for (int j = 0; j < mixers.size(); ++j)
         {
-            buf[j] += mixers[i].buffer[j];
+            buf[i] += mixers[j].buffer[i];
         }
     }
 }
 
 Mixer* MixerManager::AddMixer(std::string name)
 {
-    if (maxMixers <= mixers.size()) return nullptr;
+    if (mixers.size() >= maxMixers) return nullptr;
 
     mixerIndexes.insert({name, mixers.size()});
 
