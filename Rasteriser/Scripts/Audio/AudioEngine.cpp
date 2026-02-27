@@ -117,16 +117,15 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 	//Just in case...
 	if(!data) return;
 
-	data->mixer->buffer = std::vector<float>(numFrames*2);
+	data->mixerManager.ZeroAllBuffers();
 
 	for (int v = 0; v < NUMVOICES; ++v)
 	{
-		RenderVoiceToBuffer(&data->mixer->buffer, &data->voices[v], numFrames, data->listenerTransform);
+		RenderVoiceToBuffer(&data->voices[v].mixer->buffer, &data->voices[v], numFrames, data->listenerTransform);
 	}
 	
-	
-
-	std::copy(data->mixer->buffer.begin(), data->mixer->buffer.end(), buffer);
+	std::fill(buffer, buffer + numFrames * numChannels, 0.0f);
+	data->mixerManager.AddAllMixersIntoBuffer(buffer, numFrames);
 }
 
 //------------------------------------------------------------------------------
@@ -152,8 +151,6 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 	//Pass in any user data (stored in the AudioData struct) to the audio callback.
 	audioDescriptor.user_data = (void *)&audioData;
 
-	audioData.mixer = mixerManager.GetMixer("default");
-
 	audioData.voices[0].soundData = loader.GetSound("stereo");
 	if (audioData.voices[0].soundData == nullptr)
 	{
@@ -161,7 +158,7 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 		return 1;
 	}
 	audioData.voices[0].isLooping = true;
-	
+	audioData.voices[0].mixer = audioData.mixerManager.GetMixer("default");
 
 	for (int i = 1; i < NUMVOICES; ++i)
 	{
@@ -171,9 +168,10 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 			std::cout << "Failed to grab sound from loader!\n";
 			return 1;
 		}
-
 		audioData.voices[i].isLooping = true;
+		audioData.voices[i].mixer = audioData.mixerManager.GetMixer("default");
 	}
+	
 	
 	//Initialise sokol_audio, and start the soundcard processing audio.
 	saudio_setup(&audioDescriptor);
@@ -184,6 +182,8 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 		std::cout << "Could not initialise sokol_audio. Exiting." << std::endl;
 		return 1;
 	}
+
+	audioData.mixerManager.SetMaxSamples(saudio_buffer_frames()*2);
 
 	// <at this point, audio is now being processed>
 
