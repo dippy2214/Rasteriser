@@ -2,7 +2,7 @@
 #include <cmath>
 #include <algorithm>
 
-
+static const float pi = 3.1415f;
 
 class AudioEffect
 {
@@ -47,7 +47,7 @@ class LowPassFilter : public AudioEffect
     LowPassFilter(float cutoff, float sampRate) { sampleRate = sampRate; SetCutoff(cutoff); };
     void SetCutoff(float cutoff)
     {
-        alpha = 1.0f - std::exp(-2.0f * 3.1415f * cutoff / sampleRate);
+        alpha = 1.0f - std::exp(-2.0f * pi * cutoff / sampleRate);
     }
     void ApplyEffect(float* leftSample, float* rightSample) override
     {
@@ -63,4 +63,55 @@ class LowPassFilter : public AudioEffect
 
     float prevSampleL = 0;
     float prevSampleR = 0;
+};
+
+//one pole high pass filter
+class HighPassFilter : public AudioEffect
+{
+public:
+    HighPassFilter(float cutoff, float sampRate)
+    {
+        sampleRate = sampRate;
+        SetCutoff(cutoff);
+    }
+
+    void SetCutoff(float cutoff)
+    {
+        alpha = 1.0f - std::exp(-2.0f * pi * cutoff / sampleRate);
+    }
+
+    void ApplyEffect(float* leftSample, float* rightSample) override
+    {
+        // Left
+        prevLowL += alpha * (*leftSample - prevLowL);
+        *leftSample = *leftSample - prevLowL;
+
+        // Right
+        prevLowR += alpha * (*rightSample - prevLowR);
+        *rightSample = *rightSample - prevLowR;
+    }
+
+private:
+    float sampleRate;
+    float alpha;
+    float prevLowL = 0.0f;
+    float prevLowR = 0.0f;
+};
+
+//one pole band pass filter
+class BandPassFilter : public AudioEffect
+{
+public:
+    BandPassFilter(float lowCut, float highCut, float sampRate) 
+        : hp(lowCut, sampRate), lp(highCut, sampRate) {}
+
+    void ApplyEffect(float* leftSample, float* rightSample) override
+    {
+        hp.ApplyEffect(leftSample, rightSample);
+        lp.ApplyEffect(leftSample, rightSample);
+    }
+
+private:
+    HighPassFilter hp;
+    LowPassFilter  lp;
 };

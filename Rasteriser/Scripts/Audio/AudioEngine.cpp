@@ -196,8 +196,16 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 	audioData.voices[2].mixer = softClipper;
 
 	Mixer* lowPassFilter = audioData.mixerManager.AddMixer("low pass filter");
-	lowPassFilter->effects.emplace_back(std::make_unique<LowPassFilter>(200.f, static_cast<float>(saudio_sample_rate())));
+	lowPassFilter->effects.emplace_back(std::make_unique<LowPassFilter>(400.f, static_cast<float>(saudio_sample_rate())));
 	audioData.voices[3].mixer = lowPassFilter;	
+
+	Mixer* highPassFilter = audioData.mixerManager.AddMixer("high pass filter");
+	highPassFilter->effects.emplace_back(std::make_unique<HighPassFilter>(800.f, static_cast<float>(saudio_sample_rate())));
+	audioData.voices[4].mixer = highPassFilter;
+
+	Mixer* bandPassFilter = audioData.mixerManager.AddMixer("band pass filter");
+	bandPassFilter->effects.emplace_back(std::make_unique<BandPassFilter>(400.f, 800.f, static_cast<float>(saudio_sample_rate())));
+	audioData.voices[5].mixer = highPassFilter;
 
 	return 0;
 }
