@@ -42,8 +42,8 @@ void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, T
 	float angle = (pan + 1.0f) * 0.25f * M_PI;
 
 	//distance based attenuation gain applied here
-	float leftGain = std::cos(angle) * gain;
-	float rightGain = std::sin(angle) * gain;
+	float leftGain = std::sin(angle) * gain;
+	float rightGain = std::cos(angle) * gain;
 
 	float forward = toSource.Dot(listener->basisVectors.jhat);
 
@@ -136,24 +136,31 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 {
 	inputManager = inputMan;
 
-	//We store any data we might use in our audio callback in this struct.
+	// IMPORTANT - initialise sokol audio ASAP as other parts of the system
+	// 			   depend on it for information like sample rate of sound 
+	//			   card and sound buffer size
+	
+	saudio_desc audioDescriptor = {};
+	audioDescriptor.num_channels = 2; //playback is stereo
+	audioDescriptor.stream_userdata_cb = AudioEngine::audioCallback;
+	audioDescriptor.user_data = (void *)&audioData;
+	
+	//Initialise sokol_audio, and start the soundcard processing audio.
+	saudio_setup(&audioDescriptor);
 
-	//--------------------------------------------------------------------------
+	//Check that we were able to initialise sokol_audio.
+	if(!saudio_isvalid())
+	{
+		std::cout << "Could not initialise sokol_audio. Exiting." << std::endl;
+		return 1;
+	}
+	audioData.mixerManager.SetMaxSamples(saudio_buffer_frames()*2);
+
 	// Load sound file data here.
-	//--------------------------------------------------------------------------
 	loader.LoadSound("loop", "Assets/Audio/Loop.wav");
 	loader.LoadSound("stereo", "Assets/Audio/Stereo.wav");
-	
-	//Create a sokol_audio audio descriptor, zero its members.
-	saudio_desc audioDescriptor = {};
 
-	//Request stereo audio.
-	audioDescriptor.num_channels = 2;
-	//Pass in our audio callback.
-	audioDescriptor.stream_userdata_cb = AudioEngine::audioCallback;
-	//Pass in any user data (stored in the AudioData struct) to the audio callback.
-	audioDescriptor.user_data = (void *)&audioData;
-
+	//initialise voices
 	audioData.voices[0].soundData = loader.GetSound("stereo");
 	if (audioData.voices[0].soundData == nullptr)
 	{
@@ -174,19 +181,8 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 		audioData.voices[i].isLooping = true;
 		audioData.voices[i].mixer = audioData.mixerManager.GetMixer("default");
 	}
-	
-	//Initialise sokol_audio, and start the soundcard processing audio.
-	saudio_setup(&audioDescriptor);
 
-	//Check that we were able to initialise sokol_audio.
-	if(!saudio_isvalid())
-	{
-		std::cout << "Could not initialise sokol_audio. Exiting." << std::endl;
-		return 1;
-	}
-	// <at this point, audio is now being processed>
-	audioData.mixerManager.SetMaxSamples(saudio_buffer_frames()*2);
-	
+	// Initalisation of test mixers and sound playback
 	Mixer* hardClipper = audioData.mixerManager.AddMixer("hard clipper");
 	hardClipper->effects.emplace_back(std::make_unique<HardClip>(0.07f));
 	audioData.voices[1].mixer = hardClipper;

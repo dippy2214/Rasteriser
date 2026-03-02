@@ -50,6 +50,8 @@ public:
 
 		soundData.rawData = data;
 
+		Resample(&soundData);
+
 		sounds.insert({ soundName, soundData });
 		//drwav_free(data, NULL);
         return 0;
@@ -64,5 +66,10 @@ public:
 		}
 
 		return &sounds.at(key);
+	}
+
+	void Resample(SoundData* target)
+	{
+
 	}
 };
