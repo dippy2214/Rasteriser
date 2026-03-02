@@ -9,6 +9,7 @@ set(OLD_GLOB
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Audio/AudioSource.cpp"
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Audio/Mixer.cpp"
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Audio/MixerManager.cpp"
+  "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Audio/SoundLoader.cpp"
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/App.cpp"
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/FloatTypes.cpp"
   "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Scripts/Core/InputManager.cpp"
