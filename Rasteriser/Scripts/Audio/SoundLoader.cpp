@@ -31,10 +31,8 @@ int SoundLoader::LoadSound(const std::string& soundName, const std::string& file
 
     soundData.rawData = data;
 
-    if (soundData.channels == 1)
-    {
-        ResampleMono(&soundData, saudio_sample_rate());
-    }
+    //resample audio on load
+    Resample(&soundData, saudio_sample_rate());
 
     sounds.insert({ soundName, soundData });
     //drwav_free(data, NULL);
@@ -52,7 +50,7 @@ SoundData* SoundLoader::GetSound(const std::string& key)
     return &sounds.at(key);
 }
 
-void SoundLoader::ResampleMono(SoundData* target, int targetSampleRate)
+void SoundLoader::Resample(SoundData* target, int targetSampleRate)
 {
     std::cout << target->sampleRate << ", " << targetSampleRate << "\n";
     if (target->sampleRate == targetSampleRate) return;
@@ -63,7 +61,7 @@ void SoundLoader::ResampleMono(SoundData* target, int targetSampleRate)
 
     //allocate memory here with malloc so that drwav_free can clean up in destructors later
     //to avoid memory leaks as expected
-    float* outputData = static_cast<float*>(malloc(outputFrames * sizeof(float)));
+    float* outputData = static_cast<float*>(malloc(outputFrames * sizeof(float) * target->channels));
 
     //I am informed that making this a float can cause some weird rounding errors
     //this results in phase drift in longer files - so double it is
@@ -74,19 +72,25 @@ void SoundLoader::ResampleMono(SoundData* target, int targetSampleRate)
         int i = static_cast<int>(phase);
         double fraction = phase - i;
 
-        //dont cancel if we reach the end of lerpable territory
-        //fill buffer to avoid garbage data by repeating last sample
-        if (i + 1 >= target->numFrames)
+        //so many indexing issues came out of this function
+        int outputIndex = f * target->channels;
+        int inputIndex = i * target->channels;
+        
+        for (int c = 0; c < target->channels; ++c)
         {
-            outputData[f] = target->rawData[target->numFrames - 1];
+            //dont cancel if we reach the end of lerpable territory
+            //fill buffer to avoid garbage data by repeating last sample
+            if (i + 1 >= target->numFrames)
+            {
+                outputData[outputIndex+c] = target->rawData[((target->numFrames - 1) * target->channels) + c];
+            }
+            else
+            {
+                float sample1 = target->rawData[inputIndex+c];
+                float sample2 = target->rawData[(inputIndex + 1)+c];
+                outputData[outputIndex+c] = sample1 + (sample2 - sample1) * fraction;
+            }
         }
-        else
-        {
-            float sample1 = target->rawData[i];
-            float sample2 = target->rawData[i + 1];
-            outputData[f] = sample1 + (sample2 - sample1) * fraction;
-        }
-
         phase += phaseIncrement;
     }
     

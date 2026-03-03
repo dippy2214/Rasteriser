@@ -21,7 +21,7 @@ public:
 
 	int LoadSound(const std::string& soundName, const std::string& fileName);
 	SoundData* GetSound(const std::string& key);
-	void ResampleMono(SoundData* target, int targetSampleRate);
+	void Resample(SoundData* target, int targetSampleRate);
 
 private:
 	std::unordered_map<std::string, SoundData> sounds;
