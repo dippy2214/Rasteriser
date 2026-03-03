@@ -24,10 +24,10 @@ AudioEngine::~AudioEngine()
 
 void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, Transform* listener, float* leftSample, float*  rightSample)
 {
+	//distance based attenuation
 	float distance = (audioSource->position - listener->position).Length();
 	float gain = 0;
 	
-	//distance based attenuation
 	distance = std::max(distance, audioSource->minDistance);
 	if (distance <= audioSource->maxDistance)
 	{
@@ -41,7 +41,32 @@ void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, T
 
 	float angle = (pan + 1.0f) * 0.25f * M_PI;
 
-	//distance based attenuation gain applied here
+	//delayed playback between ears (interaural time difference)
+	const float headRadius = 0.09f; //meters
+    const float speedOfSound = 343.f; //meters per second
+    const float maxInterauralTimeDifference = headRadius/speedOfSound; //seconds
+
+	float sampleRate = saudio_sample_rate();
+	float delaySamples = pan * sampleRate * maxInterauralTimeDifference;
+
+	//use abs to account for negative or positive direction from pan
+	int intDelay = static_cast<int>(std::abs(delaySamples));
+
+	if (delaySamples > 0) { 
+		audioSource->leftITDBuffer.write(*leftSample); 
+		*leftSample = audioSource->leftITDBuffer.readRelative(intDelay);
+		
+		audioSource->rightITDBuffer.write(*rightSample);
+	}
+	else {
+		audioSource->rightITDBuffer.write(*rightSample); 
+		*rightSample = audioSource->rightITDBuffer.readRelative(intDelay);
+		
+		audioSource->leftITDBuffer.write(*leftSample);
+	}
+
+	//distance based attenuation gain applied here with interaural level difference
+	//after sample changes from interaural time difference
 	float leftGain = std::sin(angle) * gain;
 	float rightGain = std::cos(angle) * gain;
 
