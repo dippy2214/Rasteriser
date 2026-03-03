@@ -31,18 +31,26 @@ struct AudioData
 
 class AudioEngine
 {
-    
     public:
     ~AudioEngine();
+    //all initialisation happens in here
     int AudioInit(InputManager* inputMan);
+    //simple input checks for toggling voices in testing
     void AudioInputs();
+    //set active listener for entire audio engine
     void SetActiveListener(Transform* trans);
+    //attach an audio source to a voice
     void AddSourceToVoice(AudioSource* audioSource, int voiceIndex);
 
     
     private:
+    //used in audio thread to apply spatial effects to audio with spatial data 
+    //(source + valid listener) called from RenderVoiceToBuffer
     static void ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, Transform* listener, float* leftSample, float*  rightSample);
+    //per voice rendering called from audio thread
     static void RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, int numFrames, Transform* listener);
+    //our audio callback. all audio processing happens here
+    //data passed to soundcard when function returns
     static void audioCallback(float *buffer, int numFrames, int numChannels, void *userData);
     
     SoundLoader loader;

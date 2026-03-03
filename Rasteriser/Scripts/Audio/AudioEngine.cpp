@@ -70,14 +70,6 @@ void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, T
 	float leftGain = std::sin(angle) * gain;
 	float rightGain = std::cos(angle) * gain;
 
-	float forward = toSource.Dot(listener->basisVectors.jhat);
-
-	if (forward < 0)
-	{
-		leftGain *= 0.8f;
-		rightGain *= 0.8f;
-	}
-
 	*leftSample *= leftGain;
 	*rightSample *= rightGain;
 }
@@ -93,6 +85,8 @@ void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, 
 		float rightSample = 0;
 
 		int frameIndex = voice->writtenFrameCount;
+
+		//internally audio is processed as stereo and output as stereo
 		if (voice->soundData->channels == 2) //handle stereo files
 		{
 			int sampleIndex = frameIndex * 2;
@@ -105,6 +99,7 @@ void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, 
 			rightSample += (voice->soundData->rawData[voice->writtenFrameCount]);
 		}
 
+		//check for valid spatial data and apply spatial effects if found
 		if (voice->audioSource != nullptr && listener != nullptr)
 		{
 			ApplySpatialEffectsToStereoSamples(voice->audioSource, listener, &leftSample, &rightSample);
@@ -146,13 +141,17 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 
 	data->mixerManager.ZeroAllBuffers();
 
+	//render all voices to their relevant mixer's internal buffer
 	for (int v = 0; v < NUMVOICES; ++v)
 	{
 		RenderVoiceToBuffer(&data->voices[v].mixer->buffer, &data->voices[v], numFrames, data->listenerTransform);
 	}
-	
-	data->mixerManager.ApplyAllMixerEffects();
+
+	//make sure to zero buffer
 	std::fill(buffer, buffer + numFrames * numChannels, 0.0f);
+
+	//apply mixer effects and add them to final output buffer
+	data->mixerManager.ApplyAllMixerEffects();
 	data->mixerManager.AddAllMixersIntoBuffer(buffer, numFrames);
 }
 
@@ -185,7 +184,7 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 	loader.LoadSound("loop", "Assets/Audio/Loop.wav");
 	loader.LoadSound("stereo", "Assets/Audio/Stereo.wav");
 
-	//initialise voices
+	//initialise all voices (voices isolated and picked out different for testing purposes)
 	audioData.voices[0].soundData = loader.GetSound("stereo");
 	if (audioData.voices[0].soundData == nullptr)
 	{
@@ -237,6 +236,8 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 
 void AudioEngine::AudioInputs()
 {
+	//currently the input manager checks key down every frame
+	//haven't updated this yet :)
 	if (inputManager->IsKeyPressed('1')) { audioData.voices[0].isActive = !audioData.voices[0].isActive; }
 	if (inputManager->IsKeyPressed('2')) { audioData.voices[1].isActive = !audioData.voices[1].isActive; }
 	if (inputManager->IsKeyPressed('3')) { audioData.voices[2].isActive = !audioData.voices[2].isActive; }

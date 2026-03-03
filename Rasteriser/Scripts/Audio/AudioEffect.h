@@ -3,8 +3,11 @@
 #include <algorithm>
 #include "../Core/RingBuffer.h"
 
+//some annoyances trying to use math defines so just decided to use my own
+//since it is only used for pi
 static const float pi = 3.1415f;
 
+//simple audioeffect interface used for mixer effects
 class AudioEffect
 {
     public:
@@ -99,7 +102,7 @@ private:
     float prevLowR = 0.0f;
 };
 
-//one pole band pass filter
+//two pole(?) band pass filter
 class BandPassFilter : public AudioEffect
 {
 public:
@@ -117,6 +120,7 @@ private:
     LowPassFilter  lp;
 };
 
+//simple delay effect
 class Delay : public AudioEffect
 {
 public:
@@ -132,7 +136,7 @@ public:
 
     void ApplyEffect(float* leftSample, float* rightSample) override
     {
-        //avoid off by one sample errors
+        //avoid off by one sample errors by storing these first
         float delayedL = leftBuffer.readRelative(frameDelay);
         float delayedR = rightBuffer.readRelative(frameDelay);
 

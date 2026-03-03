@@ -9,18 +9,25 @@ const int maxMixers = 16;
 
 class MixerManager
 {
-    private:
+public:
+    //buffer initialisations
+    MixerManager();
+    //set a maximum sample count for mixer buffers
+    void SetMaxSamples(int maxSamp);
+    //zero all mixer buffers
+    void ZeroAllBuffers();
+    //apply all mixer effects to internal buffer of mixers
+    void ApplyAllMixerEffects();
+    //add all contents of all mixer buffers into an output buffer
+    void AddAllMixersIntoBuffer(float* buf, int numFrames);
+    //register new mixer to manager
+    Mixer* AddMixer(std::string name);
+    //get mixer from manager map
+    Mixer* GetMixer(std::string name);
+    
+private:
     std::unordered_map<std::string, int> mixerIndexes;
     std::vector<Mixer> mixers;
 
     int maxSamples;
-
-    public:
-    MixerManager();
-    void SetMaxSamples(int maxSamp);
-    void ZeroAllBuffers();
-    void ApplyAllMixerEffects();
-    void AddAllMixersIntoBuffer(float* buf, int numFrames);
-    Mixer* AddMixer(std::string name);
-    Mixer* GetMixer(std::string name);
 };

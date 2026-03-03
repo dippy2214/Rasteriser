@@ -11,6 +11,7 @@ SoundLoader::~SoundLoader()
 }
 
 int SoundLoader::LoadSound(const std::string& soundName, const std::string& fileName) {
+    
     SoundData soundData;
     
     float* data(drwav_open_file_and_read_pcm_frames_f32(fileName.c_str(),
@@ -24,18 +25,14 @@ int SoundLoader::LoadSound(const std::string& soundName, const std::string& file
         std::cout << "Could not open audio file and read data!\n";
         return 1;
     }
-    //technically speaking this copies memory
-    //sub optimal but I ran into out of scope issues without doing this
-    //and it is convinient for audio data to be structured as a vector
-    //soundData.rawData = std::vector<float>(data, data + (soundData.numFrames * soundData.channels));
 
+    //avoid reallocating memory and let drwav handle memory allocation and deallocation
     soundData.rawData = data;
 
-    //resample audio on load
+    //resample audio on load to audio card sample rate
     Resample(&soundData, saudio_sample_rate());
 
     sounds.insert({ soundName, soundData });
-    //drwav_free(data, NULL);
     return 0;
 }
 
@@ -52,7 +49,6 @@ SoundData* SoundLoader::GetSound(const std::string& key)
 
 void SoundLoader::Resample(SoundData* target, int targetSampleRate)
 {
-    std::cout << target->sampleRate << ", " << targetSampleRate << "\n";
     if (target->sampleRate == targetSampleRate) return;
 
     //lots of static casting around here to prevent rounding errors
@@ -72,7 +68,7 @@ void SoundLoader::Resample(SoundData* target, int targetSampleRate)
         int i = static_cast<int>(phase);
         double fraction = phase - i;
 
-        //so many indexing issues came out of this function
+        //so many indexing issues came out of this function so beware changing
         int outputIndex = f * target->channels;
         int inputIndex = i * target->channels;
         
