@@ -1,6 +1,7 @@
 #pragma once
 #include <cmath>
 #include <algorithm>
+#include "../Core/RingBuffer.h"
 
 static const float pi = 3.1415f;
 
@@ -114,4 +115,37 @@ public:
 private:
     HighPassFilter hp;
     LowPassFilter  lp;
+};
+
+class Delay : public AudioEffect
+{
+public:
+    Delay(float seconds, int sampleRate)
+    {
+        size_t delaySamples = static_cast<size_t>(sampleRate * seconds);
+
+        leftBuffer = RingBuffer<float>(delaySamples);
+        rightBuffer = RingBuffer<float>(delaySamples);
+
+        frameDelay = delaySamples - 1; // ensure valid index
+    }
+
+    void ApplyEffect(float* leftSample, float* rightSample) override
+    {
+        //avoid off by one sample errors
+        float delayedL = leftBuffer.readRelative(frameDelay);
+        float delayedR = rightBuffer.readRelative(frameDelay);
+
+        leftBuffer.write(*leftSample);
+        rightBuffer.write(*rightSample);
+
+        *leftSample += delayedL;
+        *rightSample += delayedR;
+    }
+
+private:
+    RingBuffer<float> leftBuffer;
+    RingBuffer<float> rightBuffer;
+    //stored as size_t to work best with ringbuffer implementation
+    size_t frameDelay;
 };

@@ -201,7 +201,11 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 
 	Mixer* bandPassFilter = audioData.mixerManager.AddMixer("band pass filter");
 	bandPassFilter->effects.emplace_back(std::make_unique<BandPassFilter>(400.f, 800.f, static_cast<float>(saudio_sample_rate())));
-	audioData.voices[5].mixer = highPassFilter;
+	audioData.voices[5].mixer = bandPassFilter;
+	
+	Mixer* delay = audioData.mixerManager.AddMixer("delay");
+	delay->effects.emplace_back(std::make_unique<Delay>(0.5f, saudio_sample_rate()));
+	audioData.voices[6].mixer = delay;
 
 	return 0;
 }
