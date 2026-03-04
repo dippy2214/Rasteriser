@@ -14,6 +14,7 @@ int SoundLoader::LoadSound(const std::string& soundName, const std::string& file
     
     SoundData soundData;
     
+    //drwav allocates internally with malloc
     float* data(drwav_open_file_and_read_pcm_frames_f32(fileName.c_str(),
         &soundData.channels,
         &soundData.sampleRate,
@@ -56,7 +57,7 @@ void SoundLoader::Resample(SoundData* target, int targetSampleRate)
     int outputFrames = static_cast<int>(target->numFrames * ratio);
 
     //allocate memory here with malloc so that drwav_free can clean up in destructors later
-    //to avoid memory leaks as expected
+    //to avoid memory leaks
     float* outputData = static_cast<float*>(malloc(outputFrames * sizeof(float) * target->channels));
 
     //I am informed that making this a float can cause some weird rounding errors
@@ -68,7 +69,7 @@ void SoundLoader::Resample(SoundData* target, int targetSampleRate)
         int i = static_cast<int>(phase);
         double fraction = phase - i;
 
-        //so many indexing issues came out of this function so beware changing
+        //so many indexing issues came out of this area so beware changing
         int outputIndex = f * target->channels;
         int inputIndex = i * target->channels;
         
