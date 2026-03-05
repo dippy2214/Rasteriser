@@ -48,7 +48,7 @@ class LowPassFilter : public AudioEffect
     LowPassFilter(float cutoff, float sampRate) { sampleRate = sampRate; SetCutoff(cutoff); };
     void SetCutoff(float cutoff)
     {
-        alpha = 1.0f - std::exp(-2.0f * pi * cutoff / sampleRate);
+        alpha = 1.0f - std::exp(-2.0f * PI * cutoff / sampleRate);
     }
     void ApplyEffect(float* leftSample, float* rightSample) override
     {
@@ -78,7 +78,7 @@ public:
 
     void SetCutoff(float cutoff)
     {
-        alpha = 1.0f - std::exp(-2.0f * pi * cutoff / sampleRate);
+        alpha = 1.0f - std::exp(-2.0f * PI * cutoff / sampleRate);
     }
 
     void ApplyEffect(float* leftSample, float* rightSample) override

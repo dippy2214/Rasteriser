@@ -165,7 +165,7 @@ int AudioEngine::AudioInit(InputManager* inputMan)
 	//			   card and sound buffer size
 	
 	saudio_desc audioDescriptor = {};
-	audioDescriptor.num_channels = 2; //playback is stereo
+	audioDescriptor.num_channels = OUTPUTCHANNELS; //playback is stereo
 	audioDescriptor.stream_userdata_cb = AudioEngine::audioCallback;
 	audioDescriptor.user_data = (void *)&audioData;
 	

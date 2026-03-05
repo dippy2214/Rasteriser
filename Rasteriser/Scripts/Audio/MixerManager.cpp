@@ -4,7 +4,7 @@
 
 MixerManager::MixerManager()
 {
-    mixers.reserve(maxMixers);
+    mixers.reserve(MAXMIXERS);
     //set up default mixer for all voices to attach
     Mixer* defaultMix = AddMixer("default");
 }
@@ -53,7 +53,7 @@ void MixerManager::AddAllMixersIntoBuffer(float* buf, int numFrames)
 
 Mixer* MixerManager::AddMixer(std::string name)
 {
-    if (mixers.size() >= maxMixers) return nullptr;
+    if (mixers.size() >= MAXMIXERS) return nullptr;
 
     mixerIndexes.insert({name, mixers.size()});
 

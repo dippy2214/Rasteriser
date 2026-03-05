@@ -8,7 +8,6 @@
 #include "../Core/InputManager.h"
 #include "../Core/Transform.h"
 
-
 #include <vector>
 #include <atomic>
 

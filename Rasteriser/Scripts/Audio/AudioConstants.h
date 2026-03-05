@@ -1,4 +1,5 @@
 #pragma once
-const float pi = 3.1415f;
+const float PI = 3.1415f;
 const int NUMVOICES = 8;
-const int maxMixers = 16;
+const int MAXMIXERS = 16;
+const int OUTPUTCHANNELS = 2;
