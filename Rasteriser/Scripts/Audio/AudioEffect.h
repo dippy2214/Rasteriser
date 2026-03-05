@@ -2,10 +2,7 @@
 #include <cmath>
 #include <algorithm>
 #include "../Core/RingBuffer.h"
-
-//some annoyances trying to use math defines so just decided to use my own
-//since it is only used for pi
-static const float pi = 3.1415f;
+#include "AudioConstants.h"
 
 //simple audioeffect interface used for mixer effects
 class AudioEffect

@@ -17,7 +17,7 @@ struct SoundData
 class SoundLoader
 {
 public:
-	//memory cleanup happens in 
+	//memory cleanup happens here 
 	~SoundLoader();
 
 	//load sound into memory from .wav file
@@ -27,7 +27,7 @@ public:
 	
 private:
 	//resample a sound to a target sample rate
-	//this is run on load of sounds to match soundcard sample rate
+	//this is run when sounds are loaded to match them to the soundcard sample rate
 	void Resample(SoundData* target, int targetSampleRate);
 
 	std::unordered_map<std::string, SoundData> sounds;

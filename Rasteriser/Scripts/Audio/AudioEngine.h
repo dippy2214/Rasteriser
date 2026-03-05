@@ -4,13 +4,14 @@
 #include "AudioSource.h"
 #include "Mixer.h"
 #include "MixerManager.h"
+#include "AudioConstants.h"
 #include "../Core/InputManager.h"
 #include "../Core/Transform.h"
+
 
 #include <vector>
 #include <atomic>
 
-static const int NUMVOICES = 8;
 
 struct Voice
 {

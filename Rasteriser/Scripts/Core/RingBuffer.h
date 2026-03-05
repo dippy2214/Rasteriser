@@ -36,8 +36,7 @@ public:
     {
         assert(offset < capacity());
 
-        size_t index =
-            (head_ + capacity() - 1 - offset) % capacity();
+        size_t index = (head_ + capacity() - 1 - offset) % capacity();
 
         return buffer_[index];
     }

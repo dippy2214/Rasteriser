@@ -4,8 +4,7 @@
 #include <string>
 
 #include "Mixer.h"
-
-const int maxMixers = 16;
+#include "AudioConstants.h"
 
 class MixerManager
 {
