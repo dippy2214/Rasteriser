@@ -14,17 +14,13 @@
 
 struct Voice
 {
-	std::atomic<bool> isActive = false;
-	std::atomic<bool> isLooping = false;
-	SoundData* soundData = nullptr;
     AudioSource* audioSource = nullptr;
-    Mixer* mixer;
 	std::atomic<int> writtenFrameCount = 0;
 };
 
 struct AudioData
 {
-    MixerManager mixerManager;
+    MixerManager* mixerManager;
     Transform* listenerTransform;
 	Voice voices[NUMVOICES];
 };
@@ -32,15 +28,21 @@ struct AudioData
 class AudioEngine
 {
     public:
+    //init for sokol audio happens here
+    AudioEngine();
     ~AudioEngine();
-    //all initialisation happens in here
-    int AudioInit(InputManager* inputMan);
-    //simple input checks for toggling voices in testing
-    void AudioInputs();
     //set active listener for entire audio engine
     void SetActiveListener(Transform* trans);
     //attach an audio source to a voice
     void AddSourceToVoice(AudioSource* audioSource, int voiceIndex);
+    //create audio source with default parameters and mixer
+    AudioSource* CreateAudioSource();
+
+    Mixer* AddMixer(const std::string& name);
+    Mixer* GetMixer(const std::string& name);
+
+    int LoadSound(const std::string& soundName, const std::string& fileName);
+    SoundData* GetSound(const std::string& name);
 
     
     private:
@@ -53,7 +55,9 @@ class AudioEngine
     //data passed to soundcard when function returns
     static void audioCallback(float *buffer, int numFrames, int numChannels, void *userData);
     
+    int currentVoiceIndex = 0;
+
+    MixerManager mixerManager;
     SoundLoader loader;
     AudioData audioData;
-    InputManager* inputManager;
 };

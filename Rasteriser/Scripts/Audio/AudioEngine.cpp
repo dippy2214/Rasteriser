@@ -16,6 +16,28 @@
 	audioCallback().
  */
 
+AudioEngine::AudioEngine()
+{
+	// IMPORTANT - initialise sokol audio here as other parts of the system
+	// 			   depend on it for information like sample rate of sound 
+	//			   card and sound buffer size
+	
+	saudio_desc audioDescriptor = {};
+	audioDescriptor.num_channels = OUTPUTCHANNELS; //playback is stereo
+	audioDescriptor.stream_userdata_cb = AudioEngine::audioCallback;
+	audioDescriptor.user_data = (void *)&audioData;
+	
+	//Initialise sokol_audio, and start the soundcard processing audio.
+	saudio_setup(&audioDescriptor);
+
+	//Check that we were able to initialise sokol_audio.
+	if(!saudio_isvalid())
+	{
+		std::cout << "Could not initialise sokol_audio. Exiting." << std::endl;
+	}
+	mixerManager.SetMaxSamples(saudio_buffer_frames()*2);
+}
+
 AudioEngine::~AudioEngine()
 {
 	//Close the soundcard, clean up after ourselves.
@@ -76,8 +98,8 @@ void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, T
 
 void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, int numFrames, Transform* listener)
 {
-	if (!voice) return;
-	if (!voice->isActive) return;
+	//we already have checked at this point that the audiosource exists
+	if (!voice->audioSource->isActive) return;
 
 	for(int i=0;i<numFrames;++i)
 	{	
@@ -87,20 +109,20 @@ void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, 
 		int frameIndex = voice->writtenFrameCount;
 
 		//internally audio is processed as stereo and output as stereo
-		if (voice->soundData->channels == 2) //handle stereo files
+		if (voice->audioSource->soundData->channels == 2) //handle stereo files
 		{
 			int sampleIndex = frameIndex * 2;
-			leftSample += (voice->soundData->rawData[sampleIndex]);
-			rightSample += (voice->soundData->rawData[sampleIndex + 1]);
+			leftSample += (voice->audioSource->soundData->rawData[sampleIndex]);
+			rightSample += (voice->audioSource->soundData->rawData[sampleIndex + 1]);
 		}
 		else //handle mono files
 		{
-			leftSample += (voice->soundData->rawData[voice->writtenFrameCount]);
-			rightSample += (voice->soundData->rawData[voice->writtenFrameCount]);
+			leftSample += (voice->audioSource->soundData->rawData[voice->writtenFrameCount]);
+			rightSample += (voice->audioSource->soundData->rawData[voice->writtenFrameCount]);
 		}
 
-		//check for valid spatial data and apply spatial effects if found
-		if (voice->audioSource != nullptr && listener != nullptr)
+		//check for spatialisation and listener and apply spatial effects if found
+		if (voice->audioSource->is3D && listener != nullptr)
 		{
 			ApplySpatialEffectsToStereoSamples(voice->audioSource, listener, &leftSample, &rightSample);
 		}
@@ -109,11 +131,11 @@ void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, 
 		(*buffer)[(2 * i) + 1] += rightSample;
 
 		voice->writtenFrameCount++;
-		if (voice->writtenFrameCount >= voice->soundData->numFrames)
+		if (voice->writtenFrameCount >= voice->audioSource->soundData->numFrames)
 		{
-			if (!voice->isLooping)
+			if (!voice->audioSource->isLooping)
 			{
-				voice->isActive = false;
+				voice->audioSource->isActive = false;
 			}
 			voice->writtenFrameCount = 0;
 		}
@@ -139,114 +161,24 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 	//Just in case...
 	if(!data) return;
 
-	data->mixerManager.ZeroAllBuffers();
+	data->mixerManager->ZeroAllBuffers();
 
 	//render all voices to their relevant mixer's internal buffer
 	for (int v = 0; v < NUMVOICES; ++v)
 	{
-		RenderVoiceToBuffer(&data->voices[v].mixer->buffer, &data->voices[v], numFrames, data->listenerTransform);
+		if (!data->voices[v].audioSource) { continue; }
+		RenderVoiceToBuffer(&data->voices[v].audioSource->mixer->buffer, &data->voices[v], numFrames, data->listenerTransform);
 	}
 
 	//make sure to zero buffer
 	std::fill(buffer, buffer + numFrames * numChannels, 0.0f);
 
 	//apply mixer effects and add them to final output buffer
-	data->mixerManager.ApplyAllMixerEffects();
-	data->mixerManager.AddAllMixersIntoBuffer(buffer, numFrames);
+	data->mixerManager->ApplyAllMixerEffects();
+	data->mixerManager->AddAllMixersIntoBuffer(buffer, numFrames);
 }
 
 //------------------------------------------------------------------------------
-int AudioEngine::AudioInit(InputManager* inputMan)
-{
-	inputManager = inputMan;
-
-	// IMPORTANT - initialise sokol audio ASAP as other parts of the system
-	// 			   depend on it for information like sample rate of sound 
-	//			   card and sound buffer size
-	
-	saudio_desc audioDescriptor = {};
-	audioDescriptor.num_channels = OUTPUTCHANNELS; //playback is stereo
-	audioDescriptor.stream_userdata_cb = AudioEngine::audioCallback;
-	audioDescriptor.user_data = (void *)&audioData;
-	
-	//Initialise sokol_audio, and start the soundcard processing audio.
-	saudio_setup(&audioDescriptor);
-
-	//Check that we were able to initialise sokol_audio.
-	if(!saudio_isvalid())
-	{
-		std::cout << "Could not initialise sokol_audio. Exiting." << std::endl;
-		return 1;
-	}
-	audioData.mixerManager.SetMaxSamples(saudio_buffer_frames()*2);
-
-	// Load sound file data here.
-	loader.LoadSound("loop", "Assets/Audio/Loop.wav");
-	loader.LoadSound("stereo", "Assets/Audio/Stereo.wav");
-
-	//initialise all voices (voices isolated and picked out different for testing purposes)
-	audioData.voices[0].soundData = loader.GetSound("stereo");
-	if (audioData.voices[0].soundData == nullptr)
-	{
-		std::cout << "Failed to grab sound from loader!\n";
-		return 1;
-	}
-	audioData.voices[0].isLooping = true;
-	audioData.voices[0].mixer = audioData.mixerManager.GetMixer("default");
-
-	for (int i = 1; i < NUMVOICES; ++i)
-	{
-		audioData.voices[i].soundData = loader.GetSound("loop");
-		if (audioData.voices[i].soundData == nullptr)
-		{
-			std::cout << "Failed to grab sound from loader!\n";
-			return 1;
-		}
-		audioData.voices[i].isLooping = true;
-		audioData.voices[i].mixer = audioData.mixerManager.GetMixer("default");
-	}
-
-	// Initalisation of test mixers and sound playback
-	Mixer* hardClipper = audioData.mixerManager.AddMixer("hard clipper");
-	hardClipper->effects.emplace_back(std::make_unique<HardClip>(0.07f));
-	audioData.voices[1].mixer = hardClipper;
-
-	Mixer* softClipper = audioData.mixerManager.AddMixer("soft clipper");
-	softClipper->effects.emplace_back(std::make_unique<SoftClip>(4.f, 0.5f));
-	audioData.voices[2].mixer = softClipper;
-
-	Mixer* lowPassFilter = audioData.mixerManager.AddMixer("low pass filter");
-	lowPassFilter->effects.emplace_back(std::make_unique<LowPassFilter>(400.f, static_cast<float>(saudio_sample_rate())));
-	audioData.voices[3].mixer = lowPassFilter;	
-
-	Mixer* highPassFilter = audioData.mixerManager.AddMixer("high pass filter");
-	highPassFilter->effects.emplace_back(std::make_unique<HighPassFilter>(800.f, static_cast<float>(saudio_sample_rate())));
-	audioData.voices[4].mixer = highPassFilter;
-
-	Mixer* bandPassFilter = audioData.mixerManager.AddMixer("band pass filter");
-	bandPassFilter->effects.emplace_back(std::make_unique<BandPassFilter>(400.f, 800.f, static_cast<float>(saudio_sample_rate())));
-	audioData.voices[5].mixer = bandPassFilter;
-	
-	Mixer* delay = audioData.mixerManager.AddMixer("delay");
-	delay->effects.emplace_back(std::make_unique<Delay>(0.5f, saudio_sample_rate()));
-	audioData.voices[6].mixer = delay;
-
-	return 0;
-}
-
-void AudioEngine::AudioInputs()
-{
-	//currently the input manager checks key down every frame
-	//haven't updated this yet :)
-	if (inputManager->IsKeyPressed('1')) { audioData.voices[0].isActive = !audioData.voices[0].isActive; }
-	if (inputManager->IsKeyPressed('2')) { audioData.voices[1].isActive = !audioData.voices[1].isActive; }
-	if (inputManager->IsKeyPressed('3')) { audioData.voices[2].isActive = !audioData.voices[2].isActive; }
-	if (inputManager->IsKeyPressed('4')) { audioData.voices[3].isActive = !audioData.voices[3].isActive; }
-	if (inputManager->IsKeyPressed('5')) { audioData.voices[4].isActive = !audioData.voices[4].isActive; }
-	if (inputManager->IsKeyPressed('6')) { audioData.voices[5].isActive = !audioData.voices[5].isActive; }
-	if (inputManager->IsKeyPressed('7')) { audioData.voices[6].isActive = !audioData.voices[6].isActive; }
-	if (inputManager->IsKeyPressed('8')) { audioData.voices[7].isActive = !audioData.voices[7].isActive; }
-}
 
 void AudioEngine::SetActiveListener(Transform* trans)
 {
@@ -256,4 +188,34 @@ void AudioEngine::SetActiveListener(Transform* trans)
 void AudioEngine::AddSourceToVoice(AudioSource* audioSource, int voiceIndex)
 {
 	audioData.voices[voiceIndex].audioSource = audioSource;
+}
+
+AudioSource* AudioEngine::CreateAudioSource()
+{
+	if (currentVoiceIndex >= NUMVOICES) { return nullptr; }
+	AudioSource* output = new AudioSource;
+	output->mixer = mixerManager.GetMixer("default");
+	AddSourceToVoice(output, currentVoiceIndex);
+	currentVoiceIndex++;
+	return output;
+}
+
+Mixer* AudioEngine::AddMixer(const std::string& name)
+{
+	return mixerManager.AddMixer(name);
+}
+
+Mixer* AudioEngine::GetMixer(const std::string& name)
+{
+	return mixerManager.GetMixer(name);
+}
+
+int AudioEngine::LoadSound(const std::string& soundName, const std::string& fileName)
+{
+	return loader.LoadSound(soundName, fileName);
+}
+
+SoundData* AudioEngine::GetSound(const std::string& soundName)
+{
+	return loader.GetSound(soundName);
 }

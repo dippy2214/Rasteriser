@@ -23,10 +23,11 @@ public:
     Mixer* AddMixer(std::string name);
     //get mixer from manager map
     Mixer* GetMixer(std::string name);
-    
+
+    std::vector<Mixer> mixers;
 private:
     std::unordered_map<std::string, int> mixerIndexes;
-    std::vector<Mixer> mixers;
+
 
     int maxSamples;
 };

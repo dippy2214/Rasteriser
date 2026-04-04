@@ -4,8 +4,9 @@
 
 MixerManager::MixerManager()
 {
+    //reserve space to avoid reallocation
     mixers.reserve(MAXMIXERS);
-    //set up default mixer for all voices to attach
+    //set up default mixer for all audio sources to attach
     Mixer* defaultMix = AddMixer("default");
 }
 
@@ -24,7 +25,7 @@ void MixerManager::ZeroAllBuffers()
 {
     for (int i = 0; i < mixers.size(); ++i)
     {
-        //do not reallocate this much memory for no reason
+        //fill in place, do not reallocate this much memory for no reason
         std::fill(mixers[i].buffer.begin(), mixers[i].buffer.end(), 0.0f);
     }
 }
@@ -58,7 +59,7 @@ Mixer* MixerManager::AddMixer(std::string name)
     mixerIndexes.insert({name, mixers.size()});
 
     //emplace back does not create new entry if space is reserved
-    //reduces memory allocations since we can now reserve memory
+    //reduces memory allocations since we reserve memory
     mixers.emplace_back();
     if (maxSamples > 0)
     {

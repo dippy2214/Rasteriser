@@ -26,12 +26,15 @@ int SoundLoader::LoadSound(const std::string& soundName, const std::string& file
         std::cout << "Could not open audio file and read data!\n";
         return 1;
     }
-
+    std::cout << soundData.channels << ", " << soundData.sampleRate << ", " << soundData.numFrames << "\n";
     //avoid reallocating memory and let drwav handle memory allocation and deallocation
     soundData.rawData = data;
 
     //resample audio on load to audio card sample rate
     Resample(&soundData, saudio_sample_rate());
+
+    std::cout << soundData.channels << ", " << soundData.sampleRate << ", " << soundData.numFrames << "\n";
+
 
     sounds.insert({ soundName, soundData });
     return 0;
@@ -96,4 +99,6 @@ void SoundLoader::Resample(SoundData* target, int targetSampleRate)
     target->sampleRate = targetSampleRate;
     target->numFrames = outputFrames;
     target->rawData = outputData;
+
+    
 }

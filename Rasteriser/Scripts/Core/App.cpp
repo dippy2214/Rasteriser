@@ -30,11 +30,25 @@ void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBu
 
 	camera.position = float3(0, 0, 0);
 
-	audioSource = new AudioSource;
-	audioSource->position = float3(0, 0, 15);
-	audioEngine.AudioInit(inputManager);
+	//initialise audio engine first
 	audioEngine.SetActiveListener(&camera);
-	audioEngine.AddSourceToVoice(audioSource, 0);
+	
+	audioEngine.LoadSound("loop", "Assets/Audio/Loop.wav");
+	audioEngine.LoadSound("stereo", "Assets/Audio/Stereo.wav");
+	
+	audioSource = audioEngine.CreateAudioSource();
+	audioSource->SetPosition(float3(0,0,15));
+	audioSource->isLooping = true;
+	audioSource->isActive = true;
+	audioSource->soundData = audioEngine.GetSound("stereo");
+	Mixer* lowPassMixer = audioEngine.AddMixer("low pass filter");
+	lowPassMixer->effects.push_back(std::make_unique<LowPassFilter>(500, saudio_sample_rate()));
+	audioSource->mixer = lowPassMixer;
+
+	if (audioSource->soundData == nullptr)
+	{
+		std::cout << "Failed to grab sound from loader!\n";
+	}
 }
 
 void App::ProcessFrame(HWND viewPort, float dt)
@@ -63,8 +77,6 @@ void App::Update(float deltaTime)
 
 void App::HandleInput(float deltaTime)
 {
-	audioEngine.AudioInputs();
-
 	float3 camMoveDelta;
 
 	
