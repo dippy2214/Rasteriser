@@ -11,6 +11,19 @@ class AudioEffect
     virtual void ApplyEffect(float* leftSample, float* rightSample) = 0; 
 };
 
+class Gain : public AudioEffect
+{
+    public:
+    Gain(float amount) { gain = amount; }
+    void ApplyEffect(float* leftSample, float* rightSample) override {
+        *leftSample *= gain;
+        *rightSample *= gain;
+    }
+
+    private:
+    float gain;
+};
+
 //basic hard clipping effect
 class HardClip : public AudioEffect
 {
