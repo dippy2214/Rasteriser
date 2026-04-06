@@ -4,14 +4,14 @@
 #include <string>
 #include <iostream>
 
-#include "dr_wav.h"
 
+//vorbis aligned sounddata struct
 struct SoundData
 {
-	unsigned int channels = 0;
-	unsigned int sampleRate = 0;
-	drwav_uint64 numFrames = 0;
-	float* rawData;
+	int channels = 0;
+	int sampleRate = 0;
+	int numFrames = 0;
+	float* rawData = nullptr;
 };
 
 class SoundLoader
@@ -21,7 +21,7 @@ public:
 	~SoundLoader();
 
 	//load sound into memory from .wav file
-	int LoadSound(const std::string& soundName, const std::string& fileName);
+	int LoadSound(const std::string& soundName, std::string fileName);
 	//get sound by key from loaded data
 	SoundData* GetSound(const std::string& key);
 	

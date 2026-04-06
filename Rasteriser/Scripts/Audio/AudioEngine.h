@@ -41,7 +41,7 @@ class AudioEngine
     Mixer* AddMixer(const std::string& name);
     Mixer* GetMixer(const std::string& name);
 
-    int LoadSound(const std::string& soundName, const std::string& fileName);
+    int LoadSound(const std::string& soundName, std::string fileName);
     SoundData* GetSound(const std::string& name);
 
     

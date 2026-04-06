@@ -1,7 +1,5 @@
-//...and we're using the sokol_audio single-header library to stream audio data
-//to our soundcard.
+//global defines go here at the top of audio engine
 #define SOKOL_IMPL
-#define DR_WAV_IMPLEMENTATION
 
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -9,12 +7,6 @@
 
 #include "AudioEngine.h"
 
-//------------------------------------------------------------------------------
-///	This struct will get passed in to audioCallback().
-/*!
-	Use it to store any data that you want to remain persistent between calls to
-	audioCallback().
- */
 
 AudioEngine::AudioEngine()
 {
@@ -36,6 +28,8 @@ AudioEngine::AudioEngine()
 		std::cout << "Could not initialise sokol_audio. Exiting." << std::endl;
 	}
 	mixerManager.SetMaxSamples(saudio_buffer_frames()*2);
+
+	audioData.mixerManager = &mixerManager;
 }
 
 AudioEngine::~AudioEngine()
@@ -210,7 +204,7 @@ Mixer* AudioEngine::GetMixer(const std::string& name)
 	return mixerManager.GetMixer(name);
 }
 
-int AudioEngine::LoadSound(const std::string& soundName, const std::string& fileName)
+int AudioEngine::LoadSound(const std::string& soundName, std::string fileName)
 {
 	return loader.LoadSound(soundName, fileName);
 }

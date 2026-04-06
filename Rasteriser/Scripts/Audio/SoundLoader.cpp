@@ -1,40 +1,58 @@
 #include "SoundLoader.h"
 #include "sokol_audio.h"
+#include <stdexcept>
+#include <iostream>
+
+#define STB_VORBIS_IMPLEMENTATION
+#include "stb_vorbis.h"
 
 SoundLoader::~SoundLoader()
 {
     //clean up sound rawData pointers created by drwav here
     for (auto i = sounds.begin(); i != sounds.end(); ++i)
     {
-        drwav_free(i->second.rawData, NULL);
+        free(i->second.rawData);
     }
 }
 
-int SoundLoader::LoadSound(const std::string& soundName, const std::string& fileName) {
+int SoundLoader::LoadSound(const std::string& soundName, std::string fileName) {
     
     SoundData soundData;
-    
-    //drwav allocates internally with malloc
-    float* data(drwav_open_file_and_read_pcm_frames_f32(fileName.c_str(),
-        &soundData.channels,
-        &soundData.sampleRate,
-        &soundData.numFrames,
-        NULL));
 
-    if (!data)
+    if (fileName.ends_with(".wav"))
     {
-        std::cout << "Could not open audio file and read data!\n";
-        return 1;
+        fileName.replace(fileName.size() - 4, 4, ".ogg");
+    }
+
+    short* decodedShort = nullptr;
+    soundData.numFrames = stb_vorbis_decode_filename(fileName.c_str(), 
+        &soundData.channels, 
+        &soundData.sampleRate,
+        &decodedShort
+    );
+
+    if (soundData.numFrames < 0 || !decodedShort)
+    {
+        throw std::runtime_error("Could not open audio file and read data!");
     }
     std::cout << soundData.channels << ", " << soundData.sampleRate << ", " << soundData.numFrames << "\n";
-    //avoid reallocating memory and let drwav handle memory allocation and deallocation
-    soundData.rawData = data;
+    
+    //convert to floats as these are better to work with than shorts
+    soundData.rawData = static_cast<float*>(
+        malloc(sizeof(float) * soundData.numFrames * soundData.channels)
+    );
+
+    // convert 16-bit PCM to float [-1.0f, 1.0f]
+    for (unsigned int i = 0; i < soundData.numFrames * soundData.channels; ++i)
+    {
+        soundData.rawData[i] = decodedShort[i] / 32768.0f;
+    }
+
+    // free the short buffer allocated by stb_vorbis
+    free(decodedShort);
 
     //resample audio on load to audio card sample rate
     Resample(&soundData, saudio_sample_rate());
-
-    std::cout << soundData.channels << ", " << soundData.sampleRate << ", " << soundData.numFrames << "\n";
-
 
     sounds.insert({ soundName, soundData });
     return 0;
@@ -95,7 +113,7 @@ void SoundLoader::Resample(SoundData* target, int targetSampleRate)
     }
     
     //clean up memory allocated by drwav to replace with new buffer
-    drwav_free(target->rawData, NULL);
+    free(target->rawData);
     target->sampleRate = targetSampleRate;
     target->numFrames = outputFrames;
     target->rawData = outputData;

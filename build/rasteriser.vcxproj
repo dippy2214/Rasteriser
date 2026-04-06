@@ -114,7 +114,7 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>			</Message>
+      <Message>				</Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Debug/Assets"
 if %errorlevel% neq 0 goto :cmEnd
@@ -150,6 +150,15 @@ setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E make_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Debug/Assets/Audio"
 if %errorlevel% neq 0 goto :cmEnd
 ffmpeg -y -i "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets/Audio/background-music.wav" -c:a libvorbis -q:a 4 "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Debug/Assets/Audio/background-music.ogg"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+powershell -Command "Remove-Item -Path 'C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Debug/Assets/Audio/*.wav' -Force"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -203,7 +212,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>			</Message>
+      <Message>				</Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Release/Assets"
 if %errorlevel% neq 0 goto :cmEnd
@@ -239,6 +248,15 @@ setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E make_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Release/Assets/Audio"
 if %errorlevel% neq 0 goto :cmEnd
 ffmpeg -y -i "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets/Audio/background-music.wav" -c:a libvorbis -q:a 4 "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Release/Assets/Audio/background-music.ogg"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+powershell -Command "Remove-Item -Path 'C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/Release/Assets/Audio/*.wav' -Force"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -292,7 +310,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>			</Message>
+      <Message>				</Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/MinSizeRel/Assets"
 if %errorlevel% neq 0 goto :cmEnd
@@ -328,6 +346,15 @@ setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E make_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/MinSizeRel/Assets/Audio"
 if %errorlevel% neq 0 goto :cmEnd
 ffmpeg -y -i "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets/Audio/background-music.wav" -c:a libvorbis -q:a 4 "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/MinSizeRel/Assets/Audio/background-music.ogg"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+powershell -Command "Remove-Item -Path 'C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/MinSizeRel/Assets/Audio/*.wav' -Force"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -380,7 +407,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message>			</Message>
+      <Message>				</Message>
       <Command>setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E copy_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets" "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/RelWithDebInfo/Assets"
 if %errorlevel% neq 0 goto :cmEnd
@@ -416,6 +443,15 @@ setlocal
 "C:\Program Files\CMake\bin\cmake.exe" -E make_directory "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/RelWithDebInfo/Assets/Audio"
 if %errorlevel% neq 0 goto :cmEnd
 ffmpeg -y -i "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/Rasteriser/Assets/Audio/background-music.wav" -c:a libvorbis -q:a 4 "C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/RelWithDebInfo/Assets/Audio/background-music.ogg"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
+setlocal
+powershell -Command "Remove-Item -Path 'C:/Users/joshu/Desktop/Personal Programming project stuff/rasteriser/build/RelWithDebInfo/Assets/Audio/*.wav' -Force"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone

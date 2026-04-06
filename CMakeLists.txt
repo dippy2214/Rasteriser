@@ -7,7 +7,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS Rasteriser/Scripts/*.cpp)
+
+
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS 
+    Rasteriser/Scripts/*.cpp
+)
+
 
 add_executable(rasteriser WIN32 ${SOURCES})
 
@@ -39,3 +44,7 @@ foreach(WAV_FILE IN LISTS WAV_FILES)
         COMMAND ffmpeg -y -i "${WAV_FILE}" -c:a libvorbis -q:a 4 "${OUTPUT_OGG}"
     )
 endforeach()
+
+add_custom_command(TARGET rasteriser POST_BUILD
+    COMMAND powershell -Command "Remove-Item -Path '$<TARGET_FILE_DIR:rasteriser>/Assets/Audio/*.wav' -Force"
+)
