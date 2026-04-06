@@ -15,9 +15,27 @@ target_link_libraries(rasteriser PRIVATE
     user32
 )
 
+set(OUTPUT_ASSETS "$<TARGET_FILE_DIR:rasteriser>/Assets")
 
 add_custom_command(TARGET rasteriser POST_BUILD
+    # Step 1: Copy assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_SOURCE_DIR}/Rasteriser/Assets"
         "$<TARGET_FILE_DIR:rasteriser>/Assets"
+)
+
+file(GLOB_RECURSE WAV_FILES "${CMAKE_SOURCE_DIR}/Rasteriser/Assets/Audio/*.wav")
+
+foreach(WAV_FILE IN LISTS WAV_FILES)
+    # Compute relative path inside Assets
+    file(RELATIVE_PATH REL_PATH "${CMAKE_SOURCE_DIR}/Rasteriser/Assets" "${WAV_FILE}")
+    set(OUTPUT_OGG "${OUTPUT_ASSETS}/${REL_PATH}")
+    string(REPLACE ".wav" ".ogg" OUTPUT_OGG "${OUTPUT_OGG}")
+
+    # Make sure output folder exists
+    get_filename_component(OUTPUT_DIR "${OUTPUT_OGG}" DIRECTORY)
+    add_custom_command(TARGET rasteriser POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${OUTPUT_DIR}"
+        COMMAND ffmpeg -y -i "${WAV_FILE}" -c:a libvorbis -q:a 4 "${OUTPUT_OGG}"
     )
+endforeach()
