@@ -52,7 +52,7 @@ void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBu
 
 	//stress test setup. Gain at 0.05 to avoid ridiculous clipping and pained ears
 	Mixer* gainMixer = audioEngine.AddMixer("gain");
-	gainMixer->effects.push_back(std::make_unique<Gain>(0.05f));
+	gainMixer->effects.push_back(std::make_unique<Gain>(0.02f));
 
 	for (int i = 0; i < 63; i++)
 	{
