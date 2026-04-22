@@ -15,6 +15,19 @@ BITMAPINFO bitmap;
 void* pixels = nullptr;
 InputManager inputManager;
 
+void enableANSI() {
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut == INVALID_HANDLE_VALUE) return;
+
+    DWORD dwMode = 0;
+    if (!GetConsoleMode(hOut, &dwMode)) return;
+
+    // Enable virtual terminal processing
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+
+    SetConsoleMode(hOut, dwMode);
+}
+
 void OpenConsole() {
 	if (AllocConsole()) {
 		// Redirect std::cout to the console
@@ -33,6 +46,8 @@ void OpenConsole() {
 	else {
 		std::cerr << "Failed to allocate console." << std::endl;
 	}
+
+	enableANSI();
 }
 
 //void DrawTestPattern()

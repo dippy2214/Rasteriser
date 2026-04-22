@@ -38,5 +38,7 @@ private:
 	Model* cube;
 	RenderTarget* renderer;
 	AudioSource* audioSource;
+
+	AudioSource* audioSources[63];
 };
 

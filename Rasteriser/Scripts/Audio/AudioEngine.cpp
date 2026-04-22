@@ -4,6 +4,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <algorithm>
+#include <iostream>
 
 #include "AudioEngine.h"
 
@@ -93,7 +94,7 @@ void AudioEngine::ApplySpatialEffectsToStereoSamples(AudioSource* audioSource, T
 void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, int numFrames, Transform* listener)
 {
 	//we already have checked at this point that the audiosource exists
-	if (!voice->audioSource->isActive) return;
+	if (!voice->audioSource->isActive.load()) return;
 
 	for(int i=0;i<numFrames;++i)
 	{	
@@ -102,7 +103,9 @@ void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, 
 
 		int frameIndex = voice->writtenFrameCount;
 
-		//internally audio is processed as stereo and output as stereo
+		//internally audio is processed and output as stereo
+		//but files are stored as either stereo or mono
+		//so we need to handle both cases
 		if (voice->audioSource->soundData->channels == 2) //handle stereo files
 		{
 			int sampleIndex = frameIndex * 2;
@@ -116,7 +119,7 @@ void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, 
 		}
 
 		//check for spatialisation and listener and apply spatial effects if found
-		if (voice->audioSource->is3D && listener != nullptr)
+		if (voice->audioSource->is3D.load() && listener != nullptr)
 		{
 			ApplySpatialEffectsToStereoSamples(voice->audioSource, listener, &leftSample, &rightSample);
 		}
@@ -127,9 +130,9 @@ void AudioEngine::RenderVoiceToBuffer(std::vector<float>* buffer, Voice* voice, 
 		voice->writtenFrameCount++;
 		if (voice->writtenFrameCount >= voice->audioSource->soundData->numFrames)
 		{
-			if (!voice->audioSource->isLooping)
+			if (!voice->audioSource->isLooping.load())
 			{
-				voice->audioSource->isActive = false;
+				voice->audioSource->isActive.store(false);
 			}
 			voice->writtenFrameCount = 0;
 		}
@@ -164,7 +167,7 @@ void AudioEngine::audioCallback(float *buffer,	//A buffer of float audio samples
 		RenderVoiceToBuffer(&data->voices[v].audioSource->mixer->buffer, &data->voices[v], numFrames, data->listenerTransform);
 	}
 
-	//make sure to zero buffer
+	//make sure to zero output buffer
 	std::fill(buffer, buffer + numFrames * numChannels, 0.0f);
 
 	//apply mixer effects and add them to final output buffer
@@ -186,7 +189,13 @@ void AudioEngine::AddSourceToVoice(AudioSource* audioSource, int voiceIndex)
 
 AudioSource* AudioEngine::CreateAudioSource()
 {
-	if (currentVoiceIndex >= NUMVOICES) { return nullptr; }
+	if (currentVoiceIndex >= NUMVOICES) {
+		//set console color with ansi codes for yellow text as this is a warning
+		std::cout << "\033[33m"; 
+		std::cout << "Audio source limit exceeded\n"; 
+		std::cout << "\033[0m";
+		return nullptr; 
+	}
 	AudioSource* output = new AudioSource;
 	output->mixer = mixerManager.GetMixer("default");
 	AddSourceToVoice(output, currentVoiceIndex);

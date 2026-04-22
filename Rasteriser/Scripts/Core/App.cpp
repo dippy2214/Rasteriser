@@ -38,16 +38,29 @@ void App::InitApp(int WIDTH, int HEIGHT, InputManager* inputs, uint32_t* frameBu
 	
 	audioSource = audioEngine.CreateAudioSource();
 	audioSource->SetPosition(float3(0,0,15));
-	audioSource->isLooping = true;
-	audioSource->isActive = true;
+	audioSource->isLooping.store(true);
+	audioSource->isActive.store(true);
 	audioSource->soundData = audioEngine.GetSound("stereo");
 	Mixer* lowPassMixer = audioEngine.AddMixer("low pass filter");
 	lowPassMixer->effects.push_back(std::make_unique<LowPassFilter>(500, saudio_sample_rate()));
 	audioSource->mixer = lowPassMixer;
 
-	if (audioSource->soundData == nullptr)
+	if (!audioSource->soundData)
 	{
 		std::cout << "Failed to grab sound from loader!\n";
+	}
+
+	//stress test setup. Gain at 0.05 to avoid ridiculous clipping and pained ears
+	Mixer* gainMixer = audioEngine.AddMixer("gain");
+	gainMixer->effects.push_back(std::make_unique<Gain>(0.05f));
+
+	for (int i = 0; i < 63; i++)
+	{
+		audioSources[i] = audioEngine.CreateAudioSource();
+		audioSources[i]->isLooping.store(false);
+		audioSources[i]->isActive.store(false);
+		audioSources[i]->mixer = gainMixer;
+		audioSources[i]->soundData = audioEngine.GetSound("stereo");
 	}
 }
 
@@ -96,6 +109,13 @@ void App::HandleInput(float deltaTime)
 	if (inputManager->IsKeyPressed('Q')) { camMoveDelta -= camera.basisVectors.jhat; }
 	
 	camera.position += camMoveDelta.Normalised() * camera.camSpeed * deltaTime;
+
+	if (inputManager->IsKeyPressed('F')) {
+		for (int i = 0; i < 63; i++)
+		{
+			audioSources[i]->isActive.store(true);
+		}
+	}
 }
 
 void App::Render()
